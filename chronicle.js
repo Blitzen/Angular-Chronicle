@@ -17,18 +17,19 @@
     function ($rootScope) {
       var watches = [];
 
-      this.record = function record( watchVars, scope, stringVars, noWatchVars ){
-        var newWatch = new Watch(watchVars, scope, stringVars, noWatchVars);
+      this.record = function record( watchVar, scope, wsString, noWatchVars ){
+        var newWatch = new Watch(watchVar, scope, wsString, noWatchVars);
         watches.push(newWatch);
         return newWatch;
       };
 
-      var Watch = function Watch(watchVars, scope, stringVars, noWatchVars){
-        this.watchVars = watchVars;
+      var Watch = function Watch(watchVar, scope, wsString, noWatchVars){
+        this.watchVar = watchVar;
         this.scope = scope;
-        this.stringVars = stringVars;
+        this.wsString = wsString;
         this.noWatchVars = noWatchVars;
         this.archive = [];
+        this.currArchivePos = null;
 
         this.addWatch();
       };
@@ -50,26 +51,25 @@
         console.log("add2archive", this);
 
         if (this.archive.length){
-          for (var i in this.watchVars){
-            //comparing to ensure there was a change... Angular's $watch triggers on registration which sucks and this is to escape that
-            if(!equals(this.scope[this.watchVars[i]], this.archive[this.archive.length-1][i][this.watchVars[i]])){
-              shouldBeAdded = true;
-            }
+          //comparing to ensure there was a change... Angular's $watch triggers on registration which sucks and this is to escape that
+          if(!equals(this.scope[this.watchVar], this.archive[this.archive.length-1][this.watchVar])){
+            shouldBeAdded = true;
           }
         }
         else{
+          //Adding to the archive if there isn't an entry there
           shouldBeAdded = true;
         }
 
         if (shouldBeAdded){
           //Adding all watched and non watched variables to the snapshot, which will be archived
           var currentSnapshot = [];
-          for (var a in this.watchVars){
-            var obj = {};
-            obj[this.watchVars[a]] = copy(this.scope[this.watchVars[a]]);
-            currentSnapshot.push(obj);
-          }
-          for (a in this.noWatchVars){
+
+          //Creating the snapshot
+          var obj = {};
+          obj[this.watchVar] = copy(this.scope[this.watchVar]);
+          currentSnapshot.push(obj);
+          for (var a in this.noWatchVars){
             var obj = {};
             obj[this.noWatchVars[a]] = copy(this.scope[this.noWatchVars[a]]);
             currentSnapshot.push(obj);
@@ -77,16 +77,17 @@
 
           //Archiving the current state of the variables
           this.archive.push(currentSnapshot);
+          this.currArchivePos = this.archive.length -1;
         }
       };
 
       Watch.prototype.addWatch = function addWatch() {
-        console.log("addwatch");
+        //Very funky way of using $watch which would conceptually translate to something along the lines of:
+        //$rootScope.$watch(this.scope[this.watchVar], this.addToArchive(), true);
+        //but of course to actually do the above you need to work some magic!
         var _this = this;
-        var i = 0;
         $rootScope.$watch(bind(_this, function() {
-          console.log(_this.scope[_this.watchVars[i]]);
-          return _this.scope[_this.watchVars[i]];
+          return _this.scope[_this.watchVar];
         }) , function(){
               _this.addToArchive.apply(_this);
         } , true);
