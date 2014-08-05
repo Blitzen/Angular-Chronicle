@@ -30,7 +30,6 @@
         this.noWatchVars = noWatchVars;
         this.archive = [];
 
-        this.addToArchive();
         this.addWatch();
       };
 
@@ -79,15 +78,18 @@
           //Archiving the current state of the variables
           this.archive.push(currentSnapshot);
         }
-          //this.addWatch();
       };
 
       Watch.prototype.addWatch = function addWatch() {
         console.log("addwatch");
+        var _this = this;
         var i = 0;
-        $rootScope.$watch(bind(this, function() {
-          return this.scope[this.watchVars[i]];
-        }) , this.addToArchive, true);
+        $rootScope.$watch(bind(_this, function() {
+          console.log(_this.scope[_this.watchVars[i]]);
+          return _this.scope[_this.watchVars[i]];
+        }) , function(){
+              _this.addToArchive.apply(_this);
+        } , true);
       };
     });
 })();
