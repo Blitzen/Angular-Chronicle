@@ -34,6 +34,8 @@
         this.addWatch();
       };
 
+
+
       //Performs the entire undo on the Watch object
       //Returns: true if successful undo, false otherwise
       Watch.prototype.undo = function undo() {
@@ -48,6 +50,9 @@
         }
         return false;
       };
+
+
+
       //Performs the entire redo on the Watch object
       //Returns: true if successful undo, false otherwise
       Watch.prototype.redo = function redo() {
@@ -62,6 +67,9 @@
         }
         return false;
       };
+
+
+
       //Returns true if a redo can be performed, false otherwise
       Watch.prototype.canRedo = function canRedo() {
         if (this.currArchivePos < this.archive.length-1){
@@ -69,6 +77,9 @@
         }
         return false;
       };
+
+
+
       //Returns true if an undo can be performed, false otherwise
       Watch.prototype.canUndo = function canUndo() {
         if (this.currArchivePos > 0){
@@ -76,6 +87,9 @@
         }
         return false;
       };
+
+
+
       Watch.prototype.addToArchive = function addToArchive() {
         var shouldBeAdded = false;
 
@@ -86,12 +100,11 @@
           }
         }
         else{
-          //Adding to the archive if there isn't an entry there
+          //Adding to the archive if there isn't an entry in the archive yet
           shouldBeAdded = true;
         }
 
         if (shouldBeAdded){
-
           //Adding all watched and non watched variables to the snapshot, which will be archived
           var currentSnapshot = [];
 
@@ -100,8 +113,8 @@
           var obj = {};
           obj[this.watchVar] = copy(this.scope[this.watchVar]);
           currentSnapshot.push(obj);
-          for (var i in this.noWatchVars){
-            var obj = {};
+          for (var i = 0; i < this.noWatchVars.length; i++){
+            obj = {};
             obj[this.noWatchVars[i]] = copy(this.scope[this.noWatchVars[i]]);
             currentSnapshot.push(obj);
           }
@@ -112,7 +125,6 @@
             //Cutting off the end of the archive if you were in the middle of your archive and made a change
             for (var i = this.currArchivePos + 1; i < this.archive.length; i++){
               this.archive.splice(this.currArchivePos+1, 1);
-              console.log(this.archive);
             }
           }
           this.archive.push(currentSnapshot);
@@ -120,8 +132,10 @@
         }
       };
 
+
+
       Watch.prototype.addWatch = function addWatch() {
-        //Very funky way of using $watch which would conceptually translate to something along the lines of:
+        //Funky way of using $watch which would conceptually translate to something along the lines of:
         //$rootScope.$watch(this.scope[this.watchVar], this.addToArchive(), true);
         //but of course to actually do the above you need to work some magic!
         var _this = this;
