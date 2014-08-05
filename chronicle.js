@@ -34,25 +34,54 @@
         this.addWatch();
       };
 
+      //Performs the entire undo on the Watch object
+      //Returns: true if successful undo, false otherwise
       Watch.prototype.undo = function undo() {
-        console.log("undo");
+        if (this.canUndo()){
+          this.currArchivePos -= 1;
+          this.scope[this.watchVar] = copy(this.archive[this.currArchivePos][0][this.watchVar]);
+
+          for (var i = 0; i < this.noWatchVars.length; i++){
+            this.scope[this.noWatchVars[i]] = copy(this.archive[this.currArchivePos][i+1][this.noWatchVars[i]]);
+          }
+          return true;
+        }
+        return false;
       };
+      //Performs the entire redo on the Watch object
+      //Returns: true if successful undo, false otherwise
       Watch.prototype.redo = function redo() {
-        console.log("redo");
+        if (this.canRedo()){
+          this.currArchivePos += 1;
+          this.scope[this.watchVar] = copy(this.archive[this.currArchivePos][0][this.watchVar]);
+
+          for (var i = 0; i < this.noWatchVars.length; i++){
+            this.scope[this.noWatchVars[i]] = copy(this.archive[this.currArchivePos][i+1][this.noWatchVars[i]]);
+          }
+          return true;
+        }
+        return false;
       };
+      //Returns true if a redo can be performed, false otherwise
       Watch.prototype.canRedo = function canRedo() {
-        console.log("can redo");
+        if (this.currArchivePos < this.archive.length-1){
+          return true;
+        }
+        return false;
       };
+      //Returns true if an undo can be performed, false otherwise
       Watch.prototype.canUndo = function canUndo() {
-        console.log("can undo");
+        if (this.currArchivePos > 0){
+          return true;
+        }
+        return false;
       };
       Watch.prototype.addToArchive = function addToArchive() {
         var shouldBeAdded = false;
-        console.log("add2archive", this);
 
         if (this.archive.length){
-          //comparing to ensure there was a change... Angular's $watch triggers on registration which sucks and this is to escape that
-          if(!equals(this.scope[this.watchVar], this.archive[this.archive.length-1][this.watchVar])){
+          //comparing to ensure there was a real change made and not just an undo/redo
+          if(!equals(this.scope[this.watchVar], this.archive[this.currArchivePos][0][this.watchVar])){
             shouldBeAdded = true;
           }
         }
@@ -62,20 +91,30 @@
         }
 
         if (shouldBeAdded){
+
           //Adding all watched and non watched variables to the snapshot, which will be archived
           var currentSnapshot = [];
+
 
           //Creating the snapshot
           var obj = {};
           obj[this.watchVar] = copy(this.scope[this.watchVar]);
           currentSnapshot.push(obj);
-          for (var a in this.noWatchVars){
+          for (var i in this.noWatchVars){
             var obj = {};
-            obj[this.noWatchVars[a]] = copy(this.scope[this.noWatchVars[a]]);
+            obj[this.noWatchVars[i]] = copy(this.scope[this.noWatchVars[i]]);
             currentSnapshot.push(obj);
           }
 
+
           //Archiving the current state of the variables
+          if (this.archive.length - 1 > this.currArchivePos){
+            //Cutting off the end of the archive if you were in the middle of your archive and made a change
+            for (var i = this.currArchivePos + 1; i < this.archive.length; i++){
+              this.archive.splice(this.currArchivePos+1, 1);
+              console.log(this.archive);
+            }
+          }
           this.archive.push(currentSnapshot);
           this.currArchivePos = this.archive.length -1;
         }
