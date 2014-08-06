@@ -15,7 +15,7 @@
     "redo"
   ],
   "license": "MIT",
-  "homepage": "https://bitbucket.org/marmotlabs/chronicle",
+  "homepage": "https://github.com/Blitzen/Angular-Chronicle",
   "ignore": [
     "**/.*",
     "node_modules",

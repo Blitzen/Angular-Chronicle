@@ -24,6 +24,7 @@
       };
 
       var Watch = function Watch(watchVar, scope, wsString, noWatchVars){
+        //Initializing Watch
         this.watchVar = watchVar;
         this.scope = scope;
         this.wsString = wsString;
