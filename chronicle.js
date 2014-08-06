@@ -25,12 +25,49 @@
 
       var Watch = function Watch(watchVar, scope, wsString, noWatchVars){
         //Initializing Watch
-        this.watchVar = watchVar;
-        this.scope = scope;
-        this.wsString = wsString;
-        this.noWatchVars = noWatchVars;
+        if (isUndefined(watchVar)){
+          console.log("Undefined watch variable passed.");
+          return undefined;
+        }
+        else{
+          this.watchVar = watchVar;
+        }
+
+        if (isUndefined(scope)){
+          console.log("Undefined scope passed.");
+          return undefined;
+        }
+        else{
+          this.scope = scope;
+        }
+
+        if (wsString !== true && wsString !== 'true'){
+          this.wsString = false;
+        }
+        else{
+          this.wsString = true;
+        }
+
+        if (isArray(noWatchVars)){
+          var allAreStrings = true;
+          for (var i in noWatchVars){
+            if (!isString(noWatchVars[i])){
+              allAreStrings = false;
+            }
+          }
+          if (allAreStrings){
+            this.noWatchVars = noWatchVars;
+          }
+        }
+        else if (isString(noWatchVars)){
+          this.noWatchVars = [noWatchVars];
+        }
+        else{
+          this.noWatchVars = [];
+        }
         this.archive = [];
         this.currArchivePos = null;
+
 
         this.addWatch();
       };
@@ -124,9 +161,8 @@
           //Archiving the current state of the variables
           if (this.archive.length - 1 > this.currArchivePos){
             //Cutting off the end of the archive if you were in the middle of your archive and made a change
-            for (var i = this.currArchivePos + 1; i < this.archive.length; i++){
-              this.archive.splice(this.currArchivePos+1, 1);
-            }
+            var diff = this.archive.length - this.currArchivePos - 1;
+            console.log(this.archive.splice(this.currArchivePos+1, diff));
           }
           this.archive.push(currentSnapshot);
           this.currArchivePos = this.archive.length -1;
