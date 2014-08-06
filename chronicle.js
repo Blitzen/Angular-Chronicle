@@ -12,9 +12,9 @@
     equals = angular.equals,
     bind = angular.bind;
 
-
+  //TODO: use $parse to evaluate the watchVar properly
   angular.module('ngChronicle', []).service('Chronicle',
-    function ($rootScope) {
+    function ($rootScope, $parse) {
       var watches = [];
 
       this.record = function record( watchVar, scope, wsString, noWatchVars ){
@@ -79,11 +79,7 @@
       Watch.prototype.undo = function undo() {
         if (this.canUndo()){
           this.currArchivePos -= 1;
-          this.scope[this.watchVar] = copy(this.archive[this.currArchivePos][0][this.watchVar]);
-
-          for (var i = 0; i < this.noWatchVars.length; i++){
-            this.scope[this.noWatchVars[i]] = copy(this.archive[this.currArchivePos][i+1][this.noWatchVars[i]]);
-          }
+          this.revert(this.currArchivePos);
           return true;
         }
         return false;
@@ -96,14 +92,19 @@
       Watch.prototype.redo = function redo() {
         if (this.canRedo()){
           this.currArchivePos += 1;
-          this.scope[this.watchVar] = copy(this.archive[this.currArchivePos][0][this.watchVar]);
-
-          for (var i = 0; i < this.noWatchVars.length; i++){
-            this.scope[this.noWatchVars[i]] = copy(this.archive[this.currArchivePos][i+1][this.noWatchVars[i]]);
-          }
+          this.revert(this.currArchivePos);
           return true;
         }
         return false;
+      };
+
+
+      Watch.prototype.revert = function revert(revertToPos){
+        this.scope[this.watchVar] = copy(this.archive[revertToPos][0][this.watchVar]);
+
+        for (var i = 0; i < this.noWatchVars.length; i++){
+          this.scope[this.noWatchVars[i]] = copy(this.archive[revertToPos][i+1][this.noWatchVars[i]]);
+        }
       };
 
 
@@ -168,7 +169,6 @@
           this.currArchivePos = this.archive.length -1;
         }
       };
-
 
 
       Watch.prototype.addWatch = function addWatch() {
