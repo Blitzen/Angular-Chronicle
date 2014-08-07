@@ -30,7 +30,7 @@
           return undefined;
         }
         else{
-          this.watchVar = watchVar;
+          this.parsedWatchVar = $parse(watchVar);
         }
 
         if (isUndefined(scope)){
@@ -48,22 +48,24 @@
           this.wsString = true;
         }
 
+        this.parsedNoWatchVars = [];
         if (isArray(noWatchVars)){
           var allAreStrings = true;
           for (var i in noWatchVars){
             if (!isString(noWatchVars[i])){
               allAreStrings = false;
             }
+            else {
+              this.parsedNoWatchVars.push($parse(noWatchVars[i]));
+            }
           }
-          if (allAreStrings){
-            this.noWatchVars = noWatchVars;
+          if (!allAreStrings){
+            console.log("Not all passed no watch variables are in string format");
+            this.parsedNoWatchVars = [];
           }
         }
         else if (isString(noWatchVars)){
-          this.noWatchVars = [noWatchVars];
-        }
-        else{
-          this.noWatchVars = [];
+          this.parsedNoWatchVars.push($parse(noWatchVars));
         }
         this.archive = [];
         this.currArchivePos = null;
@@ -100,10 +102,10 @@
 
 
       Watch.prototype.revert = function revert(revertToPos){
-        this.scope[this.watchVar] = copy(this.archive[revertToPos][0][this.watchVar]);
+        this.parsedWatchVar.assign(this.scope, copy(this.parsedWatchVar(this.archive[revertToPos][0])));
 
-        for (var i = 0; i < this.noWatchVars.length; i++){
-          this.scope[this.noWatchVars[i]] = copy(this.archive[revertToPos][i+1][this.noWatchVars[i]]);
+        for (var i = 0; i < this.parsedNoWatchVars.length; i++){
+          this.parsedNoWatchVars[i].assign(this.scope, copy(this.parsedNoWatchVars[i](this.archive[revertToPos][i+1])));
         }
       };
 
@@ -134,7 +136,7 @@
 
         if (this.archive.length){
           //comparing to ensure there was a real change made and not just an undo/redo
-          if(!equals(this.scope[this.watchVar], this.archive[this.currArchivePos][0][this.watchVar])){
+          if(!equals(this.parsedWatchVar(this.scope), this.parsedWatchVar(this.archive[this.currArchivePos][0]))){
             shouldBeAdded = true;
           }
         }
@@ -150,11 +152,11 @@
 
           //Creating the snapshot
           var obj = {};
-          obj[this.watchVar] = copy(this.scope[this.watchVar]);
+          this.parsedWatchVar.assign(obj, copy(this.parsedWatchVar(this.scope)));
           currentSnapshot.push(obj);
-          for (var i = 0; i < this.noWatchVars.length; i++){
+          for (var i = 0; i < this.parsedNoWatchVars.length; i++){
             obj = {};
-            obj[this.noWatchVars[i]] = copy(this.scope[this.noWatchVars[i]]);
+            this.parsedNoWatchVars[i].assign(obj, copy(this.parsedNoWatchVars[i](this.scope)));
             currentSnapshot.push(obj);
           }
 
@@ -173,11 +175,11 @@
 
       Watch.prototype.addWatch = function addWatch() {
         //Funky way of using $watch which would conceptually translate to something along the lines of:
-        //$rootScope.$watch(this.scope[this.watchVar], this.addToArchive(), true);
+        //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
         //but of course to actually do the above you need to work some magic!
         var _this = this;
         $rootScope.$watch(bind(_this, function() {
-          return _this.scope[_this.watchVar];
+          return _this.parsedWatchVar(_this.scope);
         }) , function(){
               _this.addToArchive.apply(_this);
         } , true);
