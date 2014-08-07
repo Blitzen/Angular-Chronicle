@@ -26,16 +26,14 @@
       var Watch = function Watch(watchVar, scope, wsString, noWatchVars){
         //Initializing Watch
         if (isUndefined(watchVar)){
-          console.log("Undefined watch variable passed.");
-          return undefined;
+          throw new Error("Undefined watch variable passed to Chronicle.");
         }
         else{
           this.parsedWatchVar = $parse(watchVar);
         }
 
         if (isUndefined(scope)){
-          console.log("Undefined scope passed.");
-          return undefined;
+          throw new Error("Undefined scope passed to Chronicle.");
         }
         else{
           this.scope = scope;
@@ -60,7 +58,7 @@
             }
           }
           if (!allAreStrings){
-            console.log("Not all passed no watch variables are in string format");
+            throw new Error("Not all passed 'no watch' variables are in string format");
             this.parsedNoWatchVars = [];
           }
         }
@@ -68,10 +66,49 @@
           this.parsedNoWatchVars.push($parse(noWatchVars));
         }
         this.archive = [];
+        this.onAdjustFunctions = [];
+        this.onRedoFunctions = [];
+        this.onUndoFunctions = [];
         this.currArchivePos = null;
 
 
         this.addWatch();
+      };
+
+
+
+      //Adds a function that will be called whenever a new archive entry is created
+      Watch.prototype.addOnAdjustFunction = function addOnAdjustFunction(fn){
+        this.onAdjustFunctions.push(fn);
+      };
+
+      //Removes a function that will is called whenever a new archive entry is created
+      Watch.prototype.removeOnAdjustFunction = function removeOnAdjustFunction(fn){
+        this.onAdjustFunctions.splice(this.onAdjustFunctions.indexOf(fn), 1);
+      };
+
+
+
+      //Adds a function that will be called whenever an undo happens
+      Watch.prototype.addOnUndoFunction = function addOnUndoFunction(fn){
+        this.onUndoFunctions.push(fn);
+      };
+
+      //Removes a function that is called whenever an undo happens
+      Watch.prototype.removeOnUndoFunction = function removeOnUndoFunction(fn){
+        this.onUndoFunctions.splice(this.onUndoFunctions.indexOf(fn), 1);
+      };
+
+
+
+      //Adds a function that will be called whenever an redo happens
+      Watch.prototype.addOnRedoFunction = function addOnRedoFunction(fn){
+        this.onRedoFunctions.push(fn);
+      };
+
+      //Removes a function that is called whenever an undo happens
+      Watch.prototype.removeOnRedoFunction = function removeOnRedoFunction(fn){
+        this.onRedoFunctions.splice(this.onRedoFunctions.indexOf(fn), 1);
       };
 
 
@@ -82,6 +119,11 @@
         if (this.canUndo()){
           this.currArchivePos -= 1;
           this.revert(this.currArchivePos);
+
+          //Running the functions designated to run on undo
+          for (var i = 0; i < this.onUndoFunctions.length; i++){
+            this.onUndoFunctions[i]();
+          }
           return true;
         }
         return false;
@@ -95,12 +137,18 @@
         if (this.canRedo()){
           this.currArchivePos += 1;
           this.revert(this.currArchivePos);
+
+          //Running the functions designated to run on redo
+          for (var i = 0; i < this.onRedoFunctions.length; i++){
+            this.onRedoFunctions[i]();
+          }
           return true;
         }
         return false;
       };
 
 
+      //Given an index in the archive, reverts all watched and non watched variables to that location in the archive
       Watch.prototype.revert = function revert(revertToPos){
         this.parsedWatchVar.assign(this.scope, copy(this.parsedWatchVar(this.archive[revertToPos][0])));
 
@@ -165,10 +213,15 @@
           if (this.archive.length - 1 > this.currArchivePos){
             //Cutting off the end of the archive if you were in the middle of your archive and made a change
             var diff = this.archive.length - this.currArchivePos - 1;
-            console.log(this.archive.splice(this.currArchivePos+1, diff));
           }
+
           this.archive.push(currentSnapshot);
           this.currArchivePos = this.archive.length -1;
+
+          //Running the functions designated to run on adjustment
+          for (i = 0; i < this.onAdjustFunctions.length; i++){
+            this.onAdjustFunctions[i]();
+          }
         }
       };
 
