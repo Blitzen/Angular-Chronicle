@@ -7,12 +7,69 @@
     isArray = angular.isArray,
     isString = angular.isString,
     isObject = angular.isObject,
+    isDate = angular.isDate,
     forEach = angular.forEach,
     copy = angular.copy,
-    equals = angular.equals,
     bind = angular.bind;
 
-  //TODO: use $parse to evaluate the watchVar properly
+  //These 3 functions are stolen from AngularJS to be able to use the modified angular.equals
+  function isRegExp(value) {
+    return toString.call(value) === '[object RegExp]';
+  }
+  function isWindow(obj) {
+    return obj && obj.window === obj;
+  }
+  function isScope(obj) {
+    return obj && obj.$evalAsync && obj.$watch;
+  }
+  //This is a modified version of angular.equals, allowing me to see exactly *what* isn't equal
+  function equals(o1, o2) {
+    if (o1 === o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+    if (o1 === null || o2 === null) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+    if (o1 !== o1 && o2 !== o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
+    var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
+    if (t1 == t2) {
+      if (t1 == 'string') {
+        if (o1 != o2){
+          return {isEqual: false, stringDiff: true, o1: o1, o2: o2};
+        }
+      }
+      if (t1 == 'object') {
+        if (isArray(o1)) {
+          if (!isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          if ((length = o1.length) == o2.length) {
+            for(key=0; key<length; key++) {
+              var eq = equals(o1[key], o2[key]);
+              if (!eq.isEqual) return eq;
+            }
+            return true;
+          }
+        } else if (isDate(o1)) {
+          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), stringDiff: false, o1: o1, o2: o2};
+        } else if (isRegExp(o1) && isRegExp(o2)) {
+          return {isEqual: o1.toString() == o2.toString(), stringDiff: false, o1: o1, o2: o2};
+        } else {
+          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          keySet = {};
+          for(key in o1) {
+            if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
+            var eq = equals(o1[key], o2[key]);
+            if (!eq.isEqual) return eq;
+            keySet[key] = true;
+          }
+          for(key in o2) {
+            if (!keySet.hasOwnProperty(key) &&
+                key.charAt(0) !== '$' &&
+                o2[key] !== undefined &&
+                !isFunction(o2[key])) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          }
+          return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+        }
+      }
+    }
+    return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+  }
+
   angular.module('ngChronicle', []).service('Chronicle',
     function ($rootScope, $parse) {
       var watches = [];
@@ -180,12 +237,18 @@
 
 
       Watch.prototype.addToArchive = function addToArchive() {
-        var shouldBeAdded = false;
+        var shouldBeAdded = false, stringDiff = false;
 
         if (this.archive.length){
+          var eq = equals(this.parsedWatchVar(this.scope), this.parsedWatchVar(this.archive[this.currArchivePos][0]));
           //comparing to ensure there was a real change made and not just an undo/redo
-          if(!equals(this.parsedWatchVar(this.scope), this.parsedWatchVar(this.archive[this.currArchivePos][0]))){
+          if(!eq.isEqual){
             shouldBeAdded = true;
+            stringDiff = eq.stringDiff;
+            if (stringDiff){
+              var o1 = eq.o1;
+              var o2 = eq.o2;
+            }
           }
         }
         else{
@@ -213,6 +276,11 @@
           if (this.archive.length - 1 > this.currArchivePos){
             //Cutting off the end of the archive if you were in the middle of your archive and made a change
             var diff = this.archive.length - this.currArchivePos - 1;
+            this.archive.splice(this.currArchivePos+1, diff);
+          }
+
+          if (stringDiff){
+            console.log("string difference", o1,o2);
           }
 
           this.archive.push(currentSnapshot);
@@ -222,6 +290,7 @@
           for (i = 0; i < this.onAdjustFunctions.length; i++){
             this.onAdjustFunctions[i]();
           }
+          console.log(this.archive);
         }
       };
 
@@ -231,7 +300,7 @@
         //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
         //but of course to actually do the above you need to work some magic!
         var _this = this;
-        $rootScope.$watch(bind(_this, function() {
+        this.cancelWatch = $rootScope.$watch(bind(_this, function() {
           return _this.parsedWatchVar(_this.scope);
         }) , function(){
               _this.addToArchive.apply(_this);
