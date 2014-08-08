@@ -70,6 +70,50 @@
     return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
   }
 
+  //Given two strings, it compares the two and returns two things:
+  //   -areSimilar: a boolean value which is true iff all the characters in the smaller string are contained, in the same order, in the bigger string
+  //   -differences: an array which contains entries which are the seperated extras in the larger string. This is hard to explain so an example is useful:
+  //
+  //   Given the strings "abcdefghijklmnopqrstuvwxyz" and "abUUUcdefghijklmnopqrstuvwAAAAxyz123", the return value will be:
+  //   { areSimilar: true (since the second one contains the first one in order)
+  //   differences: ['UUU', 'AAAA', '123']}
+  function similarStringDifference(string1, string2){
+    var s1, s2;
+    //Ensuring s2 is longer or the same length as s1
+    if (string1.length > string2.length){
+      s2 = string1.split("");
+      s1 = string2.split("");
+    }
+    else{
+      s1 = string1.split("");
+      s2 = string2.split("");
+    }
+    var j = 0;
+    var difference;
+    var differences = [];
+    for (var i = 0; (i < s1.length) && (j<s2.length); i++){
+      difference = '';
+      while(s1[i] != s2[j] && j<s2.length){
+        difference += s2[j];
+        j++;
+      }
+      //now s1[i] == s2[j] or j==s2.length
+      if (difference) differences.push(difference);
+      if (s1[i] == s2[j]) j++;
+    }
+
+    var areSimilar = (i == s1.length);
+    if (j<s2.length){
+      difference = '';
+      while (j<s2.length){
+        difference += s2[j];
+        j++;
+      }
+      differences.push(difference);
+    }
+    return {areSimilar: areSimilar, differences: differences};
+  }
+
   angular.module('ngChronicle', []).service('Chronicle',
     function ($rootScope, $parse) {
       var watches = [];
@@ -278,9 +322,23 @@
             var diff = this.archive.length - this.currArchivePos - 1;
             this.archive.splice(this.currArchivePos+1, diff);
           }
+          //TODO make this NICER!!!!! at the moment it ony check if a space has been hit to register a new change if they are similar
+          if (this.wsString && stringDiff){
+            var differenceObject = similarStringDifference(o1,o2);
 
-          if (stringDiff){
-            console.log("string difference", o1,o2);
+            if (differenceObject.areSimilar){
+              var tooSimilar = true;
+              for (var i in differenceObject.differences){
+                for (var j in differenceObject.differences[i]){
+                  if (differenceObject.differences[i][j] == ' '){
+                    tooSimilar = false;
+                  }
+                }
+              }
+              if (tooSimilar){
+                this.archive.splice(this.currArchivePos, 1);
+              }
+            }
           }
 
           this.archive.push(currentSnapshot);
