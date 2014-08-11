@@ -32,5 +32,5 @@ structure, as at the moment Chronicle does not support that directly
     watchObj.addOnAdjustFunction(intermediatefn);
 
 And if at any point you wish to remove any of these onEvent functions,
-just use `watchObj.removeOnXXXXXFunction(fn)` where XXXXX can be `Undo`,
+just use `watchObj.removeOnXXXXXFunction(fn)` where `XXXXX` can be `Undo`,
 `Redo`, or `Adjust`

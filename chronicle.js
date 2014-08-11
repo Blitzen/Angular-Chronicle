@@ -114,6 +114,37 @@
     return {areSimilar: areSimilar, differences: differences};
   }
 
+  //This function determines if the differences in two strings provide a big enough difference to warrant a new spot in the archive
+
+  //This function is given the difference array from similarStringDifference
+  //This difference array will be in the following format:
+  //  Given the strings "abcdefghijklmnopqrstuvwxyz" and "abUUUcdefghijklmnopqrstuvwAAAAxyz123", the difference array will be
+  //  differences: ['UUU', 'AAAA', '123']
+  //The differences are determined to be too similar if the following are true:
+  //  There is only one entry in the array
+  //  There are only alpha-numeric characters in the difference
+  //  The difference is shorter than 5 characters
+  function tooSimilar(differences){
+    var whiteSpace = /\s/g;
+
+    if (differences.length == 1){
+      if (differences[0].length < 5){
+        for (var a in differences[0]){
+          if (differences[0][a].match(whiteSpace)){
+            return false;
+          }
+        }
+      }
+      else{
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
+   return true;
+  }
+
   angular.module('ngChronicle', []).service('Chronicle',
     function ($rootScope, $parse) {
       var watches = [];
@@ -322,20 +353,13 @@
             var diff = this.archive.length - this.currArchivePos - 1;
             this.archive.splice(this.currArchivePos+1, diff);
           }
-          //TODO make this NICER!!!!! at the moment it ony check if a space has been hit to register a new change if they are similar
+
           if (this.wsString && stringDiff){
             var differenceObject = similarStringDifference(o1,o2);
 
             if (differenceObject.areSimilar){
-              var tooSimilar = true;
-              for (var i in differenceObject.differences){
-                for (var j in differenceObject.differences[i]){
-                  if (differenceObject.differences[i][j] == ' '){
-                    tooSimilar = false;
-                  }
-                }
-              }
-              if (tooSimilar){
+              var tooSim = tooSimilar(differenceObject.differences);
+              if (tooSim){
                 this.archive.splice(this.currArchivePos, 1);
               }
             }
