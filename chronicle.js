@@ -149,13 +149,13 @@
     function ($rootScope, $parse) {
       var watches = [];
 
-      this.record = function record( watchVar, scope, wsString, noWatchVars ){
-        var newWatch = new Watch(watchVar, scope, wsString, noWatchVars);
+      this.record = function record( watchVar, scope, stringHandling, noWatchVars ){
+        var newWatch = new Watch(watchVar, scope, stringHandling, noWatchVars);
         watches.push(newWatch);
         return newWatch;
       };
 
-      var Watch = function Watch(watchVar, scope, wsString, noWatchVars){
+      var Watch = function Watch(watchVar, scope, stringHandling, noWatchVars){
         //Initializing Watch
         if (isUndefined(watchVar)){
           throw new Error("Undefined watch variable passed to Chronicle.");
@@ -171,11 +171,11 @@
           this.scope = scope;
         }
 
-        if (wsString !== true && wsString !== 'true'){
-          this.wsString = false;
+        if (stringHandling !== true && stringHandling !== 'true'){
+          this.stringHandling = false;
         }
         else{
-          this.wsString = true;
+          this.stringHandling = true;
         }
 
         this.parsedNoWatchVars = [];
@@ -310,7 +310,11 @@
       };
 
 
-
+      //This function adds the current state of the watch variable and non watch variables if it should be added
+      //In order to *not* be added, the following conditions must be fulfilled
+      //  There is stringHandling turned on
+      //  There was a String-related change since the last archived spot
+      //  The differences in the strings from the new and last archive aren't significant (using tooSimilar)
       Watch.prototype.addToArchive = function addToArchive() {
         var shouldBeAdded = false, stringDiff = false;
 
@@ -320,10 +324,19 @@
           if(!eq.isEqual){
             shouldBeAdded = true;
             stringDiff = eq.stringDiff;
-            if (stringDiff){
+            if (this.stringHandling && stringDiff){
               var o1 = eq.o1;
               var o2 = eq.o2;
+              var differenceObject = similarStringDifference(o1,o2);
+
+              if (differenceObject.areSimilar){
+                var tooSim = tooSimilar(differenceObject.differences);
+                if (tooSim){
+                  shouldBeAdded = false;
+                }
+              }
             }
+
           }
         }
         else{
@@ -354,17 +367,6 @@
             this.archive.splice(this.currArchivePos+1, diff);
           }
 
-          if (this.wsString && stringDiff){
-            var differenceObject = similarStringDifference(o1,o2);
-
-            if (differenceObject.areSimilar){
-              var tooSim = tooSimilar(differenceObject.differences);
-              if (tooSim){
-                this.archive.splice(this.currArchivePos, 1);
-              }
-            }
-          }
-
           this.archive.push(currentSnapshot);
           this.currArchivePos = this.archive.length -1;
 
@@ -377,6 +379,7 @@
       };
 
 
+      //Adds $watch to the watch variable
       Watch.prototype.addWatch = function addWatch() {
         //Funky way of using $watch which would conceptually translate to something along the lines of:
         //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
