@@ -42,7 +42,7 @@
               var eq = equals(o1[key], o2[key]);
               if (!eq.isEqual) return eq;
             }
-            return true;
+            return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
           }
         } else if (isDate(o1)) {
           return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), stringDiff: false, o1: o1, o2: o2};
@@ -373,7 +373,6 @@
 
           //Running the functions designated to run on adjustment
           for (i = 0; i < this.onAdjustFunctions.length; i++){
-            console.log(this.onAdjustFunctions[i]);
             this.onAdjustFunctions[i]();
           }
           console.log(copy(this.archive));
