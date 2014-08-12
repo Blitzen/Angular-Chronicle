@@ -282,7 +282,6 @@
 
       //Given an index in the archive, reverts all watched and non watched variables to that location in the archive
       Watch.prototype.revert = function revert(revertToPos){
-        console.log(revertToPos);
         this.parsedWatchVar.assign(this.scope, copy(this.parsedWatchVar(this.archive[revertToPos][0])));
 
         for (var i = 0; i < this.parsedNoWatchVars.length; i++){
@@ -375,7 +374,6 @@
           for (i = 0; i < this.onAdjustFunctions.length; i++){
             this.onAdjustFunctions[i]();
           }
-          console.log(copy(this.archive));
         }
       };
 
