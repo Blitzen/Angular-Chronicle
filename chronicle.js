@@ -123,12 +123,12 @@
   //The differences are determined to be too similar if the following are true:
   //  There is only one entry in the array
   //  There are only alpha-numeric characters in the difference
-  //  The difference is shorter than 5 characters
+  //  The difference is shorter than 10 characters
   function tooSimilar(differences){
     var whiteSpace = /\s/g;
 
     if (differences.length == 1){
-      if (differences[0].length < 5){
+      if (differences[0].length < 10){
         for (var a in differences[0]){
           if (differences[0][a].match(whiteSpace)){
             return false;
@@ -282,6 +282,7 @@
 
       //Given an index in the archive, reverts all watched and non watched variables to that location in the archive
       Watch.prototype.revert = function revert(revertToPos){
+        console.log(revertToPos);
         this.parsedWatchVar.assign(this.scope, copy(this.parsedWatchVar(this.archive[revertToPos][0])));
 
         for (var i = 0; i < this.parsedNoWatchVars.length; i++){
@@ -372,9 +373,10 @@
 
           //Running the functions designated to run on adjustment
           for (i = 0; i < this.onAdjustFunctions.length; i++){
+            console.log(this.onAdjustFunctions[i]);
             this.onAdjustFunctions[i]();
           }
-          console.log(this.archive);
+          console.log(copy(this.archive));
         }
       };
 
