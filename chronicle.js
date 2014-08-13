@@ -160,7 +160,11 @@
         if (isUndefined(watchVar)){
           throw new Error("Undefined watch variable passed to Chronicle.");
         }
+        else if (isUndefined(scope[watchVar])){
+          throw new Error("WatchVar is not defined in the given scope");
+        }
         else{
+          this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
         }
 
@@ -168,6 +172,15 @@
           throw new Error("Undefined scope passed to Chronicle.");
         }
         else{
+          if (isScope(scope)){
+            this.isScope = true;
+          }
+          else if (isObject(scope)){
+            this.isScope = false;
+          }
+          else{
+            throw new Error("Incorrect scope type passed to Chronicle.");
+          }
           this.scope = scope;
         }
 
@@ -186,7 +199,12 @@
               allAreStrings = false;
             }
             else {
-              this.parsedNoWatchVars.push($parse(noWatchVars[i]));
+              if (isUndefined(scope[noWatchVars[i]])){
+                throw new Error (noWatchVars[i] + " is undefined in the given scope");
+              }
+              else{
+                this.parsedNoWatchVars.push($parse(noWatchVars[i]));
+              }
             }
           }
           if (!allAreStrings){
@@ -202,7 +220,6 @@
         this.onRedoFunctions = [];
         this.onUndoFunctions = [];
         this.currArchivePos = null;
-
 
         this.addWatch();
       };
@@ -380,15 +397,26 @@
 
       //Adds $watch to the watch variable
       Watch.prototype.addWatch = function addWatch() {
-        //Funky way of using $watch which would conceptually translate to something along the lines of:
-        //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
-        //but of course to actually do the above you need to work some magic!
         var _this = this;
-        this.cancelWatch = $rootScope.$watch(bind(_this, function() {
-          return _this.parsedWatchVar(_this.scope);
-        }) , function(){
-              _this.addToArchive.apply(_this);
-        } , true);
+        var scope = _this.scope;
+        var watch = _this.watchVar;
+        if (!this.isScope){
+          //Funky way of using $watch which would conceptually translate to something along the lines of:
+          //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
+          //but of course to actually do the above you need to do some strange stuff
+          _this.cancelWatch = $rootScope.$watch(bind(_this, function() {
+            return _this.parsedWatchVar(_this.scope);
+          }) , function(){
+                _this.addToArchive.apply(_this);
+          } , true);
+        }
+        else{
+          console.log(scope,watch);
+          _this.cancelWatch = scope.$watch(watch, function(){
+            console.log("change");
+            //_this.addToArchive.apply(_this);
+          });
+        }
       };
     });
 })();
