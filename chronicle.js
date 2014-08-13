@@ -160,9 +160,9 @@
         if (isUndefined(watchVar)){
           throw new Error("Undefined watch variable passed to Chronicle.");
         }
-        else if (isUndefined(scope[watchVar])){
-          throw new Error("WatchVar is not defined in the given scope");
-        }
+        //else if (isUndefined(scope[watchVar])){
+         // throw new Error("WatchVar is not defined in the given scope");
+        //}
         else{
           this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
@@ -199,12 +199,12 @@
               allAreStrings = false;
             }
             else {
-              if (isUndefined(scope[noWatchVars[i]])){
-                throw new Error (noWatchVars[i] + " is undefined in the given scope");
-              }
-              else{
+              //if (isUndefined(scope[noWatchVars[i]])){
+               // throw new Error (noWatchVars[i] + " is undefined in the given scope");
+              //}
+              //else{
                 this.parsedNoWatchVars.push($parse(noWatchVars[i]));
-              }
+              //}
             }
           }
           if (!allAreStrings){
