@@ -7,8 +7,8 @@ The easiest way to install is just to use [Bower](http://bower.io/
     bower intall chronicle
 
 However if you aren't using Bower, you can simply take the
-`chronicle.js` file and put it in your project, and be sure to include
-it after you include your AngularJS source file.
+`chronicle.js` file and put it in your project and include
+it in your html file after you include your AngularJS source file.
 
 ## **Basic Usage**
 First things first, you have to start recording your variable:
