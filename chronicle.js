@@ -398,24 +398,20 @@
       //Adds $watch to the watch variable
       Watch.prototype.addWatch = function addWatch() {
         var _this = this;
-        var scope = _this.scope;
-        var watch = _this.watchVar;
-        if (!this.isScope){
-          //Funky way of using $watch which would conceptually translate to something along the lines of:
-          //$rootScope.$watch(this.scope[this.parsedWatchVar], this.addToArchive(), true);
-          //but of course to actually do the above you need to do some strange stuff
+        if (_this.isScope){
+          //this is assuming the scope given variable is the angular '$scope'
+          _this.cancelWatch = _this.scope.$watch(_this.watchVar, function(){
+            _this.addToArchive.apply(_this);
+          });
+        }
+        else{
+          //This is assuming the scope variable given is using the controller as syntax
+          //this is a funkier way of doing the above because $scope obscures a lot of the magic needed to $watch a variable
           _this.cancelWatch = $rootScope.$watch(bind(_this, function() {
             return _this.parsedWatchVar(_this.scope);
           }) , function(){
                 _this.addToArchive.apply(_this);
           } , true);
-        }
-        else{
-          console.log(scope,watch);
-          _this.cancelWatch = scope.$watch(watch, function(){
-            console.log("change");
-            //_this.addToArchive.apply(_this);
-          });
         }
       };
     });
