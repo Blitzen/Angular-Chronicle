@@ -348,9 +348,6 @@
 
               if (differenceObject.areSimilar){
                 var tooSim = tooSimilar(differenceObject.differences);
-                if (tooSim){
-                  shouldBeAdded = false;
-                }
               }
             }
 
@@ -382,6 +379,11 @@
             //Cutting off the end of the archive if you were in the middle of your archive and made a change
             var diff = this.archive.length - this.currArchivePos - 1;
             this.archive.splice(this.currArchivePos+1, diff);
+          }
+
+          //Since this entry and the one before it are too similar, and you aren't on the last object left, remove the object you are on (since a newer one will be added soon)
+          if (tooSim && this.currArchivePos != 0){
+            this.archive.splice(this.currArchivePos, 1);
           }
 
           this.archive.push(currentSnapshot);
