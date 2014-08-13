@@ -1,5 +1,20 @@
 # **Chronicle**
 An undo/redo service for AngularJS.
+## **Installation**
+The easiest way to install is just to use [Bower](http://bower.io/
+"Bower").
+
+    bower intall chronicle
+
+However if you aren't using Bower, you can simply take the
+`chronicle.js` file and put it in your project, and be sure to include
+it after you include your AngularJS source file.
+
+## **Basic Usage**
+First things first, you have to start recording your variable:
+
+    $scope.chronicle = Chronicle.record('var', $scope);
+
 ## **On Event Handlers**
 You may want to perform a certain function when something happens in
 your Chronicle object. In order to do that, you may do as follows:
