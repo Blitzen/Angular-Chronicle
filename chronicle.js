@@ -24,50 +24,56 @@
   }
   //This is a modified version of angular.equals, allowing me to see exactly *what* isn't equal
   function equals(o1, o2) {
-    if (o1 === o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
-    if (o1 === null || o2 === null) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
-    if (o1 !== o1 && o2 !== o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
+    if (o1 === o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 === null || o2 === null) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 !== o1 && o2 !== o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
     var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
     if (t1 == t2) {
       if (t1 == 'string') {
         if (o1 != o2){
-          return {isEqual: false, stringDiff: true, o1: o1, o2: o2};
+          return {isEqual: false, unequalLocation: '', stringDiff: true, o1: o1, o2: o2};
         }
       }
       if (t1 == 'object') {
         if (isArray(o1)) {
-          if (!isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          if (!isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           if ((length = o1.length) == o2.length) {
             for(key=0; key<length; key++) {
               var eq = equals(o1[key], o2[key]);
-              if (!eq.isEqual) return eq;
+              if (!eq.isEqual){
+                eq.unequalLocation = '['+String(key)+']' + eq.unequalLocation;
+                return eq;
+              }
             }
-            return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+            return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           }
         } else if (isDate(o1)) {
-          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         } else if (isRegExp(o1) && isRegExp(o2)) {
-          return {isEqual: o1.toString() == o2.toString(), stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: o1.toString() == o2.toString(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         } else {
-          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           keySet = {};
           for(key in o1) {
             if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
             var eq = equals(o1[key], o2[key]);
-            if (!eq.isEqual) return eq;
+            if (!eq.isEqual){
+              eq.unequalLocation = '.'+String(key) + eq.unequalLocation;
+              return eq;
+            }
             keySet[key] = true;
           }
           for(key in o2) {
             if (!keySet.hasOwnProperty(key) &&
                 key.charAt(0) !== '$' &&
                 o2[key] !== undefined &&
-                !isFunction(o2[key])) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+                !isFunction(o2[key])) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           }
-          return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         }
       }
     }
-    return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+    return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
   }
 
   //Given two strings, it compares the two and returns two things:
@@ -338,7 +344,9 @@
           if(!eq.isEqual){
             shouldBeAdded = true;
             stringDiff = eq.stringDiff;
-            if (this.stringHandling && stringDiff){
+            eq.unequalLocation = this.watchVar + eq.unequalLocation;
+            var parsedUnequalLocation = $parse(eq.unequalLocation);
+            if (this.stringHandling && eq.stringDiff){
               var o1 = eq.o1;
               var o2 = eq.o2;
               var differenceObject = similarStringDifference(o1,o2);
