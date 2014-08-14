@@ -157,15 +157,16 @@
 
       var Watch = function Watch(watchVar, scope, stringHandling, noWatchVars){
         //Initializing Watch
-        if (isUndefined(watchVar)){
-          throw new Error("Undefined watch variable passed to Chronicle.");
+        if (!isString(watchVar)){
+          throw new Error("Watch variable that is not a string was passed to Chronicle.");
         }
-        //else if (isUndefined(scope[watchVar])){
-         // throw new Error("WatchVar is not defined in the given scope");
         //}
         else{
           this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
+          if (isUndefined(this.parsedWatchVar(scope))){
+            throw new Error(watchVar + ", the watch variable passed to Chronicle, is not defined in the given scope");
+          }
         }
 
         if (isUndefined(scope)){
@@ -193,27 +194,23 @@
 
         this.parsedNoWatchVars = [];
         if (isArray(noWatchVars)){
-          var allAreStrings = true;
           for (var i in noWatchVars){
             if (!isString(noWatchVars[i])){
-              allAreStrings = false;
+              throw new Error("Not all passed 'no watch' variables are in string format");
             }
             else {
-              //if (isUndefined(scope[noWatchVars[i]])){
-               // throw new Error (noWatchVars[i] + " is undefined in the given scope");
-              //}
-              //else{
-                this.parsedNoWatchVars.push($parse(noWatchVars[i]));
-              //}
+              this.parsedNoWatchVars.push($parse(noWatchVars[i]));
+              if (isUndefined(this.parsedNoWatchVars[i](scope))){
+                throw new Error(noWatchVars[i] + ", a 'no watch' variable passed to Chronicle, is not defined in the given scope");
+              }
             }
-          }
-          if (!allAreStrings){
-            throw new Error("Not all passed 'no watch' variables are in string format");
-            this.parsedNoWatchVars = [];
           }
         }
         else if (isString(noWatchVars)){
           this.parsedNoWatchVars.push($parse(noWatchVars));
+        }
+        else if (!isUndefined(noWatchVars)){
+          throw new Error ("Incorect type for 'no watch' variables");
         }
         this.archive = [];
         this.onAdjustFunctions = [];
