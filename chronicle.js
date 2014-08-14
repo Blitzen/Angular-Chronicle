@@ -167,7 +167,6 @@
         if (!isString(watchVar)){
           throw new Error("Watch variable that is not a string was passed to Chronicle.");
         }
-        //}
         else{
           this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
