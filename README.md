@@ -2,7 +2,7 @@
 An undo/redo service for AngularJS.
 
 Note: Since the current version is not yet at 1.x.x, there is the
-chanche of API changes that could fundamentally wreck certain
+chance of API changes that could fundamentally wreck certain
 functionality. Use this beta at your own risk.
 
 ## **Installation**

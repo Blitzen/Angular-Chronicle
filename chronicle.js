@@ -25,41 +25,41 @@
   }
   //This is a modified version of angular.equals, allowing me to see exactly *what* isn't equal
   function equals(o1, o2) {
-    if (o1 === o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
-    if (o1 === null || o2 === null) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
-    if (o1 !== o1 && o2 !== o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
+    if (o1 === o2) return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 === null || o2 === null) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 !== o1 && o2 !== o2) return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
     var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
     if (t1 == t2) {
       if (t1 == 'string') {
         if (o1 != o2){
-          return {isEqual: false, unequalLocation: '', stringDiff: true, o1: o1, o2: o2};
+          return {isEqual: false, unequalVariable: '', stringDiff: true, o1: o1, o2: o2};
         }
       }
       if (t1 == 'object') {
         if (isArray(o1)) {
-          if (!isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+          if (!isArray(o2)) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           if ((length = o1.length) == o2.length) {
             for(key=0; key<length; key++) {
               var eq = equals(o1[key], o2[key]);
               if (!eq.isEqual){
-                eq.unequalLocation = '['+String(key)+']' + eq.unequalLocation;
+                eq.unequalVariable = '['+String(key)+']' + eq.unequalVariable;
                 return eq;
               }
             }
-            return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+            return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           }
         } else if (isDate(o1)) {
-          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
         } else if (isRegExp(o1) && isRegExp(o2)) {
-          return {isEqual: o1.toString() == o2.toString(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: o1.toString() == o2.toString(), unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
         } else {
-          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           keySet = {};
           for(key in o1) {
             if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
             var eq = equals(o1[key], o2[key]);
             if (!eq.isEqual){
-              eq.unequalLocation = '.'+String(key) + eq.unequalLocation;
+              eq.unequalVariable = '.'+String(key) + eq.unequalVariable;
               return eq;
             }
             keySet[key] = true;
@@ -68,13 +68,13 @@
             if (!keySet.hasOwnProperty(key) &&
                 key.charAt(0) !== '$' &&
                 o2[key] !== undefined &&
-                !isFunction(o2[key])) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+                !isFunction(o2[key])) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           }
-          return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
         }
       }
     }
-    return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+    return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
   }
 
   //Given two strings, it compares the two and returns two things:
@@ -162,8 +162,9 @@
         return newWatch;
       };
 
+      //Initializing Watch
       var Watch = function Watch(watchVar, scope, stringHandling, noWatchVars){
-        //Initializing Watch
+        //watchVar
         if (!isString(watchVar)){
           throw new Error("Watch variable that is not a string was passed to Chronicle.");
         }
@@ -171,7 +172,7 @@
           this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
           if (isUndefined(this.parsedWatchVar(scope))){
-            throw new Error(watchVar + ", the watch variable passed to Chronicle, is not defined in the given scope");
+            throw new Error(watchVar + ", the watch variable passed to Chronicle, is not defined in the given scope.");
           }
         }
 
@@ -336,32 +337,34 @@
       //  There was a String-related change since the last archived spot
       //  The differences in the strings from the new and last archive aren't significant (using tooSimilar)
       Watch.prototype.addToArchive = function addToArchive() {
-        var shouldBeAdded = false, stringDiff = false;
+        var shouldBeAdded = false;
 
         if (this.archive.length){
           //comparing to ensure there was a real change made and not just an undo/redo
           var eq = equals(this.parsedWatchVar(this.scope), this.archive[this.currArchivePos].watchVar);
           if(!eq.isEqual){
+            //So now we know it's not an undo/redo that caused the change.
             shouldBeAdded = true;
-            stringDiff = eq.stringDiff;
-            var parsedUnequalLocation = $parse(this.watchVar + eq.unequalLocation);
+
+            //Getting the parsed variable that caused the inequality
+            var parsedUnequalVariable = $parse(this.watchVar + eq.unequalVariable);
+
+            //now we are going to look at string differences... This block only matters if the watch has been initialized with their stringHandling set to true
             if (this.stringHandling && eq.stringDiff){
               var tooSim = false;
-              var o1 = eq.o1;
-              var o2 = eq.o2;
-              var differenceObject = similarStringDifference(o1,o2);
+              var differenceObject = similarStringDifference(eq.o1,eq.o2);
 
               if (differenceObject.areSimilar){
-                if (this.archive[this.currArchivePos].parsedUnequalLocation == parsedUnequalLocation){
+                if (this.archive[this.currArchivePos].parsedUnequalVariable == parsedUnequalVariable){
                   //We only consider them too similar if the same variable was changed last time and this time and their differences are considered to not be big enough by tooSimilar()
                   //Too similar means the
                   var tooSim = tooSimilar(differenceObject.differences);
                   if (tooSim){
                     //Checks to see if the length of the string that was changed is more than MAX_STRING_CHANGE_SIZE characters in length different in the most recent entry than in the previous entry.
-                    //($parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
-                    //$parse('watchVar'+eq.unequalLocation) is the parsedUnequalLocation but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
+                    //($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
+                    //$parse('watchVar'+eq.unequalVariable) is the parsedUnequalVariable but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
                     //(this.archive[this.currArchivePos-1]) is the archive entry before the one we are on. We look at the one before because the one we are currently on is likely going to be overwritten.
-                    if (Math.abs($parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos-1]).length - $parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos]).length) >= MAX_STRING_CHANGE_SIZE){
+                    if (Math.abs($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1]).length - $parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos]).length) >= MAX_STRING_CHANGE_SIZE){
                       tooSim = false;
                     }
                   }
@@ -377,17 +380,17 @@
         }
 
         if (shouldBeAdded){
-          this.newEntry(tooSim, parsedUnequalLocation);
+          this.newEntry(tooSim, parsedUnequalVariable);
         }
       };
 
 
       //Creates new archive entry, and deletes the one before it if asked to
-      Watch.prototype.newEntry = function newEntry(removeOneBefore, parsedUnequalLocation) {
+      Watch.prototype.newEntry = function newEntry(removeOneBefore, parsedUnequalVariable) {
         //Adding all watched and non watched variables to the snapshot, which will be archived
         var currentSnapshot = {};
         currentSnapshot.noWatchVars = [];
-        currentSnapshot.parsedUnequalLocation = parsedUnequalLocation;
+        currentSnapshot.parsedUnequalVariable = parsedUnequalVariable;
 
 
         //Creating the snapshot
