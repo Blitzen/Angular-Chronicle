@@ -1,6 +1,7 @@
 (function () {
   "use strict";
-
+  //Set this to change what the maxiumum number of characters an undo will be to a string if using the string specific saving
+  var MAX_STRING_CHANGE_SIZE = 5;
   var isDefined = angular.isDefined,
     isUndefined = angular.isUndefined,
     isFunction = angular.isFunction,
@@ -24,50 +25,56 @@
   }
   //This is a modified version of angular.equals, allowing me to see exactly *what* isn't equal
   function equals(o1, o2) {
-    if (o1 === o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
-    if (o1 === null || o2 === null) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
-    if (o1 !== o1 && o2 !== o2) return {isEqual: true, stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
+    if (o1 === o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 === null || o2 === null) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
+    if (o1 !== o1 && o2 !== o2) return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2}; // NaN === NaN
     var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
     if (t1 == t2) {
       if (t1 == 'string') {
         if (o1 != o2){
-          return {isEqual: false, stringDiff: true, o1: o1, o2: o2};
+          return {isEqual: false, unequalLocation: '', stringDiff: true, o1: o1, o2: o2};
         }
       }
       if (t1 == 'object') {
         if (isArray(o1)) {
-          if (!isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          if (!isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           if ((length = o1.length) == o2.length) {
             for(key=0; key<length; key++) {
               var eq = equals(o1[key], o2[key]);
-              if (!eq.isEqual) return eq;
+              if (!eq.isEqual){
+                eq.unequalLocation = '['+String(key)+']' + eq.unequalLocation;
+                return eq;
+              }
             }
-            return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+            return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           }
         } else if (isDate(o1)) {
-          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         } else if (isRegExp(o1) && isRegExp(o2)) {
-          return {isEqual: o1.toString() == o2.toString(), stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: o1.toString() == o2.toString(), unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         } else {
-          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+          if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           keySet = {};
           for(key in o1) {
             if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
             var eq = equals(o1[key], o2[key]);
-            if (!eq.isEqual) return eq;
+            if (!eq.isEqual){
+              eq.unequalLocation = '.'+String(key) + eq.unequalLocation;
+              return eq;
+            }
             keySet[key] = true;
           }
           for(key in o2) {
             if (!keySet.hasOwnProperty(key) &&
                 key.charAt(0) !== '$' &&
                 o2[key] !== undefined &&
-                !isFunction(o2[key])) return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+                !isFunction(o2[key])) return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
           }
-          return {isEqual: true, stringDiff: false, o1: o1, o2: o2};
+          return {isEqual: true, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
         }
       }
     }
-    return {isEqual: false, stringDiff: false, o1: o1, o2: o2};
+    return {isEqual: false, unequalLocation: '', stringDiff: false, o1: o1, o2: o2};
   }
 
   //Given two strings, it compares the two and returns two things:
@@ -157,15 +164,15 @@
 
       var Watch = function Watch(watchVar, scope, stringHandling, noWatchVars){
         //Initializing Watch
-        if (isUndefined(watchVar)){
-          throw new Error("Undefined watch variable passed to Chronicle.");
+        if (!isString(watchVar)){
+          throw new Error("Watch variable that is not a string was passed to Chronicle.");
         }
-        //else if (isUndefined(scope[watchVar])){
-         // throw new Error("WatchVar is not defined in the given scope");
-        //}
         else{
           this.watchVar = watchVar;
           this.parsedWatchVar = $parse(watchVar);
+          if (isUndefined(this.parsedWatchVar(scope))){
+            throw new Error(watchVar + ", the watch variable passed to Chronicle, is not defined in the given scope");
+          }
         }
 
         if (isUndefined(scope)){
@@ -193,27 +200,23 @@
 
         this.parsedNoWatchVars = [];
         if (isArray(noWatchVars)){
-          var allAreStrings = true;
           for (var i in noWatchVars){
             if (!isString(noWatchVars[i])){
-              allAreStrings = false;
+              throw new Error("Not all passed 'no watch' variables are in string format");
             }
             else {
-              //if (isUndefined(scope[noWatchVars[i]])){
-               // throw new Error (noWatchVars[i] + " is undefined in the given scope");
-              //}
-              //else{
-                this.parsedNoWatchVars.push($parse(noWatchVars[i]));
-              //}
+              this.parsedNoWatchVars.push($parse(noWatchVars[i]));
+              if (isUndefined(this.parsedNoWatchVars[i](scope))){
+                throw new Error(noWatchVars[i] + ", a 'no watch' variable passed to Chronicle, is not defined in the given scope");
+              }
             }
-          }
-          if (!allAreStrings){
-            throw new Error("Not all passed 'no watch' variables are in string format");
-            this.parsedNoWatchVars = [];
           }
         }
         else if (isString(noWatchVars)){
           this.parsedNoWatchVars.push($parse(noWatchVars));
+        }
+        else if (!isUndefined(noWatchVars)){
+          throw new Error ("Incorect type for 'no watch' variables");
         }
         this.archive = [];
         this.onAdjustFunctions = [];
@@ -299,10 +302,10 @@
 
       //Given an index in the archive, reverts all watched and non watched variables to that location in the archive
       Watch.prototype.revert = function revert(revertToPos){
-        this.parsedWatchVar.assign(this.scope, copy(this.parsedWatchVar(this.archive[revertToPos][0])));
+        this.parsedWatchVar.assign(this.scope, copy(this.archive[revertToPos].watchVar));
 
         for (var i = 0; i < this.parsedNoWatchVars.length; i++){
-          this.parsedNoWatchVars[i].assign(this.scope, copy(this.parsedNoWatchVars[i](this.archive[revertToPos][i+1])));
+          this.parsedNoWatchVars[i].assign(this.scope, copy(this.archive[revertToPos].noWatchVars[i]));
         }
       };
 
@@ -336,18 +339,33 @@
         var shouldBeAdded = false, stringDiff = false;
 
         if (this.archive.length){
-          var eq = equals(this.parsedWatchVar(this.scope), this.parsedWatchVar(this.archive[this.currArchivePos][0]));
           //comparing to ensure there was a real change made and not just an undo/redo
+          var eq = equals(this.parsedWatchVar(this.scope), this.archive[this.currArchivePos].watchVar);
           if(!eq.isEqual){
             shouldBeAdded = true;
             stringDiff = eq.stringDiff;
-            if (this.stringHandling && stringDiff){
+            var parsedUnequalLocation = $parse(this.watchVar + eq.unequalLocation);
+            if (this.stringHandling && eq.stringDiff){
+              var tooSim = false;
               var o1 = eq.o1;
               var o2 = eq.o2;
               var differenceObject = similarStringDifference(o1,o2);
 
               if (differenceObject.areSimilar){
-                var tooSim = tooSimilar(differenceObject.differences);
+                if (this.archive[this.currArchivePos].parsedUnequalLocation == parsedUnequalLocation){
+                  //We only consider them too similar if the same variable was changed last time and this time and their differences are considered to not be big enough by tooSimilar()
+                  //Too similar means the
+                  var tooSim = tooSimilar(differenceObject.differences);
+                  if (tooSim){
+                    //Checks to see if the length of the string that was changed is more than MAX_STRING_CHANGE_SIZE characters in length different in the most recent entry than in the previous entry.
+                    //($parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
+                    //$parse('watchVar'+eq.unequalLocation) is the parsedUnequalLocation but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
+                    //(this.archive[this.currArchivePos-1]) is the archive entry before the one we are on. We look at the one before because the one we are currently on is likely going to be overwritten.
+                    if (Math.abs($parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos-1]).length - $parse('watchVar'+eq.unequalLocation)(this.archive[this.currArchivePos]).length) >= MAX_STRING_CHANGE_SIZE){
+                      tooSim = false;
+                    }
+                  }
+                }
               }
             }
 
@@ -359,40 +377,44 @@
         }
 
         if (shouldBeAdded){
-          //Adding all watched and non watched variables to the snapshot, which will be archived
-          var currentSnapshot = [];
+          this.newEntry(tooSim, parsedUnequalLocation);
+        }
+      };
 
 
-          //Creating the snapshot
-          var obj = {};
-          this.parsedWatchVar.assign(obj, copy(this.parsedWatchVar(this.scope)));
-          currentSnapshot.push(obj);
-          for (var i = 0; i < this.parsedNoWatchVars.length; i++){
-            obj = {};
-            this.parsedNoWatchVars[i].assign(obj, copy(this.parsedNoWatchVars[i](this.scope)));
-            currentSnapshot.push(obj);
-          }
+      //Creates new archive entry, and deletes the one before it if asked to
+      Watch.prototype.newEntry = function newEntry(removeOneBefore, parsedUnequalLocation) {
+        //Adding all watched and non watched variables to the snapshot, which will be archived
+        var currentSnapshot = {};
+        currentSnapshot.noWatchVars = [];
+        currentSnapshot.parsedUnequalLocation = parsedUnequalLocation;
 
 
-          //Archiving the current state of the variables
-          if (this.archive.length - 1 > this.currArchivePos){
-            //Cutting off the end of the archive if you were in the middle of your archive and made a change
-            var diff = this.archive.length - this.currArchivePos - 1;
-            this.archive.splice(this.currArchivePos+1, diff);
-          }
+        //Creating the snapshot
+        currentSnapshot.watchVar = copy(this.parsedWatchVar(this.scope));
+        for (var i = 0; i < this.parsedNoWatchVars.length; i++){
+          currentSnapshot.noWatchVars.push(copy(this.parsedNoWatchVars[i](this.scope)));
+        }
 
-          //Since this entry and the one before it are too similar, and you aren't on the last object left, remove the object you are on (since a newer one will be added soon)
-          if (tooSim && this.currArchivePos != 0){
-            this.archive.splice(this.currArchivePos, 1);
-          }
 
-          this.archive.push(currentSnapshot);
-          this.currArchivePos = this.archive.length -1;
+        //Archiving the current state of the variables
+        if (this.archive.length - 1 > this.currArchivePos){
+          //Cutting off the end of the archive if you were in the middle of your archive and made a change
+          var diff = this.archive.length - this.currArchivePos - 1;
+          this.archive.splice(this.currArchivePos+1, diff);
+        }
 
-          //Running the functions designated to run on adjustment
-          for (i = 0; i < this.onAdjustFunctions.length; i++){
-            this.onAdjustFunctions[i]();
-          }
+        //Since this entry and the one before it are too similar, and you aren't on the last object left, remove the object you are on (since a newer one will be added soon)
+        if (removeOneBefore){
+          this.archive.splice(this.currArchivePos, 1);
+        }
+
+        this.archive.push(currentSnapshot);
+        this.currArchivePos = this.archive.length -1;
+
+        //Running the functions designated to run on adjustment
+        for (i = 0; i < this.onAdjustFunctions.length; i++){
+          this.onAdjustFunctions[i]();
         }
       };
 

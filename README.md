@@ -1,6 +1,10 @@
 # **Chronicle**
 An undo/redo service for AngularJS.
 
+Note: Since the current version is not yet at 1.x.x, there is the
+chanche of API changes that could fundamentally wreck certain
+functionality. Use this beta at your own risk.
+
 ## **Installation**
 The easiest way to install is just to use [Bower](http://bower.io/
 "Bower").
