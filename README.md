@@ -24,6 +24,8 @@ is Chronicle's official page, and it contains a number of useful
 examples that cover different supported pieces of functionality.
 
 ## **Basic Usage**
+ADD LINK HERE FOR
+http://blitzen.github.io/Angular-Chronicle/#basic-example
 First things first, you have to start recording your variable:
 
 ```javascript
