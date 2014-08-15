@@ -8,8 +8,9 @@ functionality. Use this beta at your own risk.
 ## **Installation**
 The easiest way to install is just to use [Bower](http://bower.io/
 "Bower").
-
-    bower intall chronicle
+    ```javscript
+    bower install chronicle
+    ```
 
 However if you aren't using Bower, you can simply take the
 [`chronicle.js`](https://github.com/Blitzen/Angular-Chronicle/blob/master/chronicle.js "chronicle.js")
@@ -24,7 +25,22 @@ examples that cover different supported pieces of functionality.
 ## **Basic Usage**
 First things first, you have to start recording your variable:
 
-    $scope.chronicle = Chronicle.record('var', $scope);
+```javascript
+$scope.var = "test";
+$scope.chronicle = Chronicle.record('var', $scope);
+```
+
+You then take this scope variable and call functions on it.
+
+```javascript
+$scope.chronicle.undo();
+$scope.chronicle.redo();
+$scope.chronicle.canUndo();
+$scope.chronicle.canRedo();
+```
+
+These functions should be self explanitory. This should be enough for
+basic undo/redo functionality.
 
 ## **On Event Handlers**
 You may want to perform a certain function when something happens in
