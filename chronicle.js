@@ -24,6 +24,11 @@
     return obj && obj.$evalAsync && obj.$watch;
   }
   //This is a modified version of angular.equals, allowing me to see exactly *what* isn't equal
+  //It returns an object as so:
+  //  isEqual: self explanitory
+  //  unequalVariable: returns where it finds something unequal ie if your watch variable is $scope.obj and $scope.obj.arr[0].foo was changed, it will return ".arr[0].foo"
+  //  stringDiff: was it a string change that caused the unequality or not
+  //  o1, o2 are just the two unequal objects
   function equals(o1, o2) {
     if (o1 === o2) return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
     if (o1 === null || o2 === null) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
@@ -156,6 +161,8 @@
     function ($rootScope, $parse) {
       var watches = [];
 
+      //This is called to create the Watch
+      //watches is a private array which shouldn't have to be dealt with. May one day be useful for loading up specific watches
       this.record = function record( watchVar, scope, stringHandling, noWatchVars ){
         var newWatch = new Watch(watchVar, scope, stringHandling, noWatchVars);
         watches.push(newWatch);
@@ -176,6 +183,7 @@
           }
         }
 
+        //scope
         if (isUndefined(scope)){
           throw new Error("Undefined scope passed to Chronicle.");
         }
@@ -192,6 +200,7 @@
           this.scope = scope;
         }
 
+        //stringHandling
         if (stringHandling !== true && stringHandling !== 'true'){
           this.stringHandling = false;
         }
@@ -199,6 +208,7 @@
           this.stringHandling = true;
         }
 
+        //noWatchVars
         this.parsedNoWatchVars = [];
         if (isArray(noWatchVars)){
           for (var i in noWatchVars){
@@ -219,6 +229,8 @@
         else if (!isUndefined(noWatchVars)){
           throw new Error ("Incorect type for 'no watch' variables");
         }
+
+        //Other variables on watch that need initializtion
         this.archive = [];
         this.onAdjustFunctions = [];
         this.onRedoFunctions = [];
