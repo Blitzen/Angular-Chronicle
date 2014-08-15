@@ -183,7 +183,7 @@ update before it completely. Too similar is defined as:
 
 - The longer string is no more than 5 characters longer than the shorter
   string (this number can be changed - it is the variable
-  MAX_STRING_CHANGE_SIZE at the top of
+  `MAX_STRING_CHANGE_SIZE` at the top of
 [`chronicle.js`](https://github.com/Blitzen/Angular-Chronicle/blob/dev/chronicle.js/#L4 "chronicle.js line 4")
 
 - The longer string has no whitespace in the extra characters
@@ -253,33 +253,41 @@ $scope.chron.redo();
 You may want to perform a certain function when something happens in
 your Chronicle object. In order to do that, you may do as follows:
 
-    watchObj.addOnUndoFunction(fn)
+```javascript
+$scope.chron.addOnUndoFunction(fn)
+```
 
-This will make Chronicle call `fn()` whenever watchObj sucessfully
-undoes
+This will make Chronicle call `fn()` whenever the `$scope.chron` object
+sucessfully undoes.
 
-    watchObj.addOnRedoFunction(fn)
+```javascript
+$scope.chron.addOnRedoFunction(fn)
+```
 
-This will make Chronicle call `fn()` whenever watchObj sucessfully
-redoes
+This will make Chronicle call `fn()` whenever the `$scope.chron` object
+sucessfully redoes.
 
-    watchObj.addOnAdjustFunction(fn)
+```javascript
+$scope.chron.addOnAdjustFunction(fn)
+```
 
-This will make Chronicle call `fn()` whenever watchObj sucessfully
-registers a change that is *not* an undo or redo - bascially any update
-to the model that isn't a direct undo or redo.
+This will make Chronicle call `fn()` whenever the `$scope.chron` object
+sucessfully registers a change that is *not* an undo or redo - bascially any update
+to the model that isn't caused by a direct call to `undo()` or `redo()`.
 
 If you wish to call a function with arguements, I suggest the following
-structure, as at the moment Chronicle does not support that directly
+structure, as at the moment Chronicle does not support that directly:
 
-    fn = function(passedVars){...} //The function that you wish to call
-    intermediatefn = function() {
-      var passingVars = ...//Get vars
-      fn(passingVars);
-    }
-    ...
-    watchObj.addOnAdjustFunction(intermediatefn);
+```javascript
+$scope.fn = function(passedVars){...} //The function that you wish to call
+$scope.intermediatefn = function() {
+  var passingVars = ...//Get vars
+  $scope.fn(passingVars);
+}
+...
+$scope.chron.addOnAdjustFunction(intermediatefn);
+```
 
 And if at any point you wish to remove any of these onEvent functions,
-just use `watchObj.removeOnXXXXXFunction(fn)` where `XXXXX` can be `Undo`,
-`Redo`, or `Adjust`
+just use `watchObj.removeOnEventFunction(fn)` where `Event` can be `Undo`,
+`Redo`, or `Adjust`.
