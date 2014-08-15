@@ -121,9 +121,8 @@ Generally good practice would be to avoid trying to watch a specific
 variable in an array. However watching a specific variable in an object
 is just fine.
 
-This watch variable will record the entire variable. So if the watch
-variable is an array or object, it will watch everything in the
-object/array:
+The watch will record the entire variable. So if the watch variable is
+an object or array, it will watch everything in the object/array:
 
 ```javascript
 $scope.obj = {};
