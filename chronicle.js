@@ -151,7 +151,7 @@
    return true;
   }
 
-  angular.module('ngChronicle', []).service('Chronicle',
+  angular.module('Chronicle', []).service('Chronicle',
     function ($rootScope, $parse) {
       var watches = [];
 
