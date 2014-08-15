@@ -203,6 +203,10 @@ $scope.chron = Chronicle.record('watchThis', $scope, false, 'dontWatchThis');
 
 ```
 
+Since the no watch variable option is the fourth one, be sure to pass
+the string handling variable before it, even if you don't intend to use
+that functionality (just pass `false` in that case).
+
 You can also pass in an array of no watch variables to tie a number of
 them to the Chronicle object (note - this does NOT work with watch
 variables, you may only have one watch variable).
