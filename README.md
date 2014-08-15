@@ -183,7 +183,8 @@ update before it completely. Too similar is defined as:
 
 - The longer string is no more than 5 characters longer than the shorter
   string (this number can be changed - it is the variable
-  MAX_STRING_CHANGE_SIZE at the top of `chronicle.js`
+  MAX_STRING_CHANGE_SIZE at the top of
+[`chronicle.js`](https://github.com/Blitzen/Angular-Chronicle/blob/dev/chronicle.js/#L4 "chronicle.js line 4")
 
 - The longer string has no whitespace in the extra characters
 
