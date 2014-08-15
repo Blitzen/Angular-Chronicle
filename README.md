@@ -289,5 +289,5 @@ $scope.chron.addOnAdjustFunction(intermediatefn);
 ```
 
 And if at any point you wish to remove any of these onEvent functions,
-just use `watchObj.removeOnEventFunction(fn)` where `Event` can be `Undo`,
+just use `watchObj.removeOnEventFunction(fn)`, where `Event` can be `Undo`,
 `Redo`, or `Adjust`.
