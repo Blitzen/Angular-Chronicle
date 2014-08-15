@@ -255,6 +255,8 @@ $scope.chron.redo();
 You may want to perform a certain function when something happens in
 your Chronicle object. In order to do that, you may do as follows:
 
+WHERE MUST FN BE??
+
 ```javascript
 $scope.chron.addOnUndoFunction(fn)
 ```
