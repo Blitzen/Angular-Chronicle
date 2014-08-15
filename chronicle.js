@@ -135,20 +135,14 @@
   //The differences are determined to be too similar if the following are true:
   //  There is only one entry in the array
   //  There are only alpha-numeric characters in the difference
-  //  The difference is shorter than 10 characters
   function tooSimilar(differences){
     var whiteSpace = /\s/g;
 
     if (differences.length == 1){
-      if (differences[0].length < 10){
-        for (var a in differences[0]){
-          if (differences[0][a].match(whiteSpace)){
-            return false;
-          }
+      for (var a in differences[0]){
+        if (differences[0][a].match(whiteSpace)){
+          return false;
         }
-      }
-      else{
-        return false;
       }
     }
     else{
@@ -244,7 +238,12 @@
 
       //Adds a function that will be called whenever a new archive entry is created
       Watch.prototype.addOnAdjustFunction = function addOnAdjustFunction(fn){
-        this.onAdjustFunctions.push(fn);
+        if (isFunction(fn)){
+          this.onAdjustFunctions.push(fn);
+        }
+        else{
+          throw new Error("Function added to run on adjustment is not a function");
+        }
       };
 
       //Removes a function that will is called whenever a new archive entry is created
@@ -256,7 +255,12 @@
 
       //Adds a function that will be called whenever an undo happens
       Watch.prototype.addOnUndoFunction = function addOnUndoFunction(fn){
-        this.onUndoFunctions.push(fn);
+        if (isFunction(fn)){
+          this.onUndoFunctions.push(fn);
+        }
+        else{
+          throw new Error("Function added to run on undo is not a function");
+        }
       };
 
       //Removes a function that is called whenever an undo happens
@@ -268,7 +272,12 @@
 
       //Adds a function that will be called whenever an redo happens
       Watch.prototype.addOnRedoFunction = function addOnRedoFunction(fn){
-        this.onRedoFunctions.push(fn);
+        if (isFunction(fn)){
+          this.onRedoFunctions.push(fn);
+        }
+        else{
+          throw new Error("Function added to run on redo is not a function");
+        }
       };
 
       //Removes a function that is called whenever an undo happens
