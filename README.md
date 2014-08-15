@@ -210,7 +210,7 @@ variables, you may only have one watch variable).
 ```javascript
 $scope.watchThis = 'abc';
 $scope.dontWatchThis = 12;
-$scope.norThis = 'I'm being';
+$scope.norThis = "I'm being";
 $scope.ignorePlease = {};
 $scope.chron = Chronicle.record('watchThis', $scope, false, ['dontWatchThis', 'norThis', 'ignorePlease']);
 ...
