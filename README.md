@@ -27,8 +27,8 @@ examples that cover different supported pieces of functionality.
 First things first, you have to start recording your variable:
 
 ```javascript
-$scope.var = 'test';
-$scope.chronicle = Chronicle.record('var', $scope);
+$scope.str = 'test';
+$scope.chronicle = Chronicle.record('str', $scope);
 ```
 
 You then take this scope variable and call functions on it.
@@ -109,12 +109,12 @@ This parameter must be a string version of how you access the variable
 you want to watch. For example:
 
 ```javascript
-$scope.obj.arrOfObjs[2].var //The var you want to watch
+$scope.obj.arrOfObjs[2].foo //The var you want to watch
 
-$scope.chronicle = Chronicle.record('obj.arrOfObjs[2].var', $scope); //This is valid
-$scope.chronicle = Chronicle.record(obj.arrOfObjs[2].var, $scope); //invalid
+$scope.chronicle = Chronicle.record('obj.arrOfObjs[2].foo', $scope); //This is valid
+$scope.chronicle = Chronicle.record(obj.arrOfObjs[2].foo, $scope); //invalid
 var index = 2;
-$scope.chronicle = Chronicle.record('obj.arrOfObjs[index].var', $scope); //invalid
+$scope.chronicle = Chronicle.record('obj.arrOfObjs[index].foo', $scope); //invalid
 ```
 
 Generally good practice would be to avoid trying to watch a specific
