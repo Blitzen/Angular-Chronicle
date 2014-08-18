@@ -450,7 +450,7 @@
           //this is assuming the scope given variable is the angular '$scope'
           _this.cancelWatch = _this.scope.$watch(_this.watchVar, function(){
             _this.addToArchive.apply(_this);
-          });
+          }, true);
         }
         else{
           //This is assuming the scope variable given is using the controller as syntax
