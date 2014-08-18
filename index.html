@@ -82,8 +82,9 @@ examples that cover different supported pieces of functionality.</p>
 </pre></div>
 
 <p>These functions should be self explanitory.
-<a href="http://blitzen.github.io/Angular-Chronicle/#basic-example">This</a> should
-be enough for basic undo/redo functionality.</p>
+This should be enough for basic undo/redo functionality.</p>
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/1p6rLrna/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 <h2>
 <a name="full-usage" class="anchor" href="#full-usage"><span class="octicon octicon-link"></span></a><strong>Full Usage</strong>
@@ -178,6 +179,8 @@ an object or array, it will watch everything in the object/array:</p>
 <span class="nx">$scope</span><span class="p">.</span><span class="nx">str</span> <span class="o">+=</span> <span class="s1">'def'</span><span class="p">;</span> <span class="c1">//New thing to undo.</span>
 </pre></div>
 
+<iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/q690L2Lj/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 <h2>
 <a name="scope" class="anchor" href="#scope"><span class="octicon octicon-link"></span></a><strong>Scope</strong>
 </h2>
@@ -201,6 +204,8 @@ just the same as using <code>$scope</code>, just replace <code>$scope</code> wit
 <span class="nx">vm</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="nx">vm</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchThis'</span><span class="p">,</span> <span class="nx">vm</span><span class="p">);</span>
 </pre></div>
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/q58ojzru/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 <h2>
 <a name="string-handling" class="anchor" href="#string-handling"><span class="octicon octicon-link"></span></a><strong>String Handling</strong>
@@ -233,8 +238,8 @@ string (this number can be changed - it is the variable
 <code>MAX_STRING_CHANGE_SIZE</code> at the top of
 <a href="https://github.com/Blitzen/Angular-Chronicle/blob/dev/chronicle.js/#L4" title="chronicle.js line 4"><code>chronicle.js</code></a></p></li>
 <li><p>The longer string has no whitespace in the extra characters</p></li>
-</ul><p><a href="http://blitzen.github.io/Angular-Chronicle" title="Chronicle Website">Here (not here yet!!)</a>
-is a demo of string specific handling in action.</p>
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/d1kx6t9v/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 <h2>
 <a name="no-watch-variables" class="anchor" href="#no-watch-variables"><span class="octicon octicon-link"></span></a><strong>No Watch Variables</strong>
@@ -294,6 +299,8 @@ variables, you may only have one watch variable).</p>
 <span class="c1">//watchThis='abcdefg', dontWatchThis = 5,</span>
 <span class="c1">//norThis = "I'm being ignored", ignorePlease = {member: 3}</span>
 </pre></div>
+
+<iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/6urcvvtb/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 <h2>
 <a name="on-event-handlers" class="anchor" href="#on-event-handlers"><span class="octicon octicon-link"></span></a><strong>On Event Handlers</strong>
