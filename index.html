@@ -56,33 +56,8 @@ file and put it in your project and include
 it in your html file after you include your AngularJS source file.</p>
 
 <h2>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a><strong>Examples</strong>
-</h2>
-
-<p><a href="http://blitzen.github.io/Angular-Chronicle" title="Chronicle Website">Here</a>
-is Chronicle's official page, and it contains a number of useful
-examples that cover different supported pieces of functionality.</p>
-
-<h2>
 <a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a><strong>Basic Usage</strong>
 </h2>
-
-<p>First things first, you have to start recording your variable:</p>
-
-<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">str</span> <span class="o">=</span> <span class="s1">'test'</span><span class="p">;</span>
-<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'str'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span>
-</pre></div>
-
-<p>You then take this scope variable and call functions on it.</p>
-
-<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span>
-<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
-<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">canUndo</span><span class="p">();</span>
-<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">canRedo</span><span class="p">();</span>
-</pre></div>
-
-<p>These functions should be self explanitory.
-This should be enough for basic undo/redo functionality.</p>
 
 <iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/1p6rLrna/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
