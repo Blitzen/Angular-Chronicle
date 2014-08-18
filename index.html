@@ -32,21 +32,310 @@
 
         <section id="main_content">
           <h1>
-<a name="angular-chronicle" class="anchor" href="#angular-chronicle"><span class="octicon octicon-link"></span></a>Angular-Chronicle</h1>
+<a name="chronicle" class="anchor" href="#chronicle"><span class="octicon octicon-link"></span></a><strong>Chronicle</strong>
+</h1>
 
-<p>Chronicle is a service for AngularJS meant to provide easy plug n' play undo/redo functionality.</p>
+<p>An undo/redo service for AngularJS.</p>
+
+<p>Note: Since the current version is not yet at 1.x.x, there is the
+chance of API changes that could fundamentally wreck certain
+functionality. Use this beta at your own risk.</p>
 
 <h2>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a><strong>Installation</strong>
+</h2>
 
-<p>Here are some examples of Chronicle being used.</p>
+<p>The easiest way to install is just to use <a href="http://bower.io/" title="Bower">Bower</a>.</p>
 
-<section id="basic-example">
-  <h3>
-    Basic Example
-  </h3>
-  <iframe width="100%" height="300" src="http://jsfiddle.net/SamMaier/HB7LU/5525/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-</section>
+<pre lang="javscript"><code>bower install chronicle
+</code></pre>
+
+<p>However if you aren't using Bower, you can simply take the
+<a href="https://github.com/Blitzen/Angular-Chronicle/blob/master/chronicle.js" title="chronicle.js"><code>chronicle.js</code></a>
+file and put it in your project and include
+it in your html file after you include your AngularJS source file.</p>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a><strong>Examples</strong>
+</h2>
+
+<p><a href="http://blitzen.github.io/Angular-Chronicle" title="Chronicle Website">Here</a>
+is Chronicle's official page, and it contains a number of useful
+examples that cover different supported pieces of functionality.</p>
+
+<h2>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a><strong>Basic Usage</strong>
+</h2>
+
+<p>First things first, you have to start recording your variable:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">str</span> <span class="o">=</span> <span class="s1">'test'</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'str'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span>
+</pre></div>
+
+<p>You then take this scope variable and call functions on it.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">canUndo</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span><span class="p">.</span><span class="nx">canRedo</span><span class="p">();</span>
+</pre></div>
+
+<p>These functions should be self explanitory.
+<a href="http://blitzen.github.io/Angular-Chronicle/#basic-example">This</a> should
+be enough for basic undo/redo functionality.</p>
+
+<h2>
+<a name="full-usage" class="anchor" href="#full-usage"><span class="octicon octicon-link"></span></a><strong>Full Usage</strong>
+</h2>
+
+<p>At the moment, there are only four arguments you can give
+<code>Chronicle.record</code>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchVar'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="nx">handleStringsBool</span><span class="p">,</span> <span class="s1">'noWatchVar'</span><span class="p">);</span>
+</pre></div>
+
+<p><a href="#watch-variable"><code>'watchVar'</code></a> is the stringified variable you want to
+be able to undo on.</p>
+
+<p><a href="#scope"><code>scope</code></a> is the variable that contains your watch variable and
+your unwatched variables.</p>
+
+<p><a href="#string-handling"><code>handleStringsBool</code></a> is the variable that determines
+if you want to handle strings in a more user input friendly way.</p>
+
+<p><a href="#no-watch-variables"><code>noWatchVar</code></a> is the stringified variable that you
+want to be able to store alongside your watch variable but not trigger
+your watch variable.</p>
+
+<p>The functions that you can then use on <code>$scope.chron</code>:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span>
+</pre></div>
+
+<p>Undoes to the previous change.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
+</pre></div>
+
+<p>Redoes to the next change.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnUndoFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnRedoFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnAdjustFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+</pre></div>
+
+<p>Use these functions to make Chronicle call a function whenever a
+significant event happens to the Chronicle object.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">removeOnUndoFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">removeOnRedoFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">removeOnAdjustFunction</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
+</pre></div>
+
+<p>Removes the passed function call on the event. More info on the above 6
+functions <a href="#on-event-handlers">here</a>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">canUndo</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">canRedo</span><span class="p">();</span>
+</pre></div>
+
+<p>Returns true if the action can be performed, false if you can't perform
+the action at the current time.</p>
+
+<h2>
+<a name="watch-variable" class="anchor" href="#watch-variable"><span class="octicon octicon-link"></span></a><strong>Watch Variable</strong>
+</h2>
+
+<p>This parameter must be a string version of how you access the variable
+you want to watch. For example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">obj</span><span class="p">.</span><span class="nx">arrOfObjs</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">foo</span> <span class="c1">//The var you want to watch</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'obj.arrOfObjs[2].foo'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span> <span class="c1">//This is valid</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">arrOfObjs</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span> <span class="c1">//invalid</span>
+<span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'obj.arrOfObjs[index].foo'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span> <span class="c1">//invalid</span>
+</pre></div>
+
+<p>Generally good practice would be to avoid trying to watch a specific
+variable in an array. However watching a specific variable in an object
+is just fine.</p>
+
+<p>The watch will record the entire variable. So if the watch variable is
+an object or array, it will watch everything in the object/array:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">obj</span><span class="p">.</span><span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">obj</span><span class="p">.</span><span class="nx">str</span> <span class="o">=</span> <span class="s1">'abc'</span><span class="p">;</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'obj'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">obj</span><span class="p">.</span><span class="nx">newVar</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span> <span class="c1">//New thing to undo</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span> <span class="c1">//New thing to undo</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">str</span> <span class="o">+=</span> <span class="s1">'def'</span><span class="p">;</span> <span class="c1">//New thing to undo.</span>
+</pre></div>
+
+<h2>
+<a name="scope" class="anchor" href="#scope"><span class="octicon octicon-link"></span></a><strong>Scope</strong>
+</h2>
+
+<p>This is the scope of the controller with the variable you want to watch.
+<code>$scope</code> can be used.</p>
+
+<h3>
+<a name="controller-as-syntax" class="anchor" href="#controller-as-syntax"><span class="octicon octicon-link"></span></a>Controller As Syntax</h3>
+
+<p>This library fully supports "controller as" syntax. So everything will work
+just the same as using <code>$scope</code>, just replace <code>$scope</code> with <code>this</code>:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="k">this</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="s1">'something'</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchThis'</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</pre></div>
+
+<p>As well as:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+<span class="nx">vm</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">vm</span><span class="p">.</span><span class="nx">chronicle</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchThis'</span><span class="p">,</span> <span class="nx">vm</span><span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="string-handling" class="anchor" href="#string-handling"><span class="octicon octicon-link"></span></a><strong>String Handling</strong>
+</h2>
+
+<p>This service provides an option for handling strings in a special way.
+This option was designed with text inputs in mind - no user wants an
+undo to change only a single character each time. String handling is by
+default not active.</p>
+
+<p>To enable this, pass <code>true</code> to the third arguement on
+<code>Chronicle.record</code>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">undoRedo</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'var'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// turns string handling on</span>
+</pre></div>
+
+<h3>
+<a name="specific-details-on-string-handling" class="anchor" href="#specific-details-on-string-handling"><span class="octicon octicon-link"></span></a>Specific Details on String Handling</h3>
+
+<p>Specific string handling, when on, works like this:
+The newest update is always kept. However if the newest update is
+considered to be too similar to the update before it, it removes the
+update before it completely. Too similar is defined as:</p>
+
+<ul>
+<li><p>One string contains the other string completely, in order, with only 1
+place where the longer string contains extra characters.</p></li>
+<li><p>The longer string is no more than 5 characters longer than the shorter
+string (this number can be changed - it is the variable
+<code>MAX_STRING_CHANGE_SIZE</code> at the top of
+<a href="https://github.com/Blitzen/Angular-Chronicle/blob/dev/chronicle.js/#L4" title="chronicle.js line 4"><code>chronicle.js</code></a></p></li>
+<li><p>The longer string has no whitespace in the extra characters</p></li>
+</ul><p><a href="http://blitzen.github.io/Angular-Chronicle" title="Chronicle Website">Here (not here yet!!)</a>
+is a demo of string specific handling in action.</p>
+
+<h2>
+<a name="no-watch-variables" class="anchor" href="#no-watch-variables"><span class="octicon octicon-link"></span></a><strong>No Watch Variables</strong>
+</h2>
+
+<p>You have the option to provide secondary variable(s) to Chronicle which
+will be stored whenever your watch variable is changed but, if changed,
+will not trigger a new undo location. This looks like so:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="s1">'abc'</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">dontWatchThis</span> <span class="o">=</span> <span class="s1">'ignored'</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchThis'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s1">'dontWatchThis'</span><span class="p">);</span>
+
+</pre></div>
+
+<p>Since the no watch variable option is the fourth one, be sure to pass
+the string handling variable before it, even if you don't intend to use
+that functionality (just pass <code>false</code> in that case).</p>
+
+<p>You can also pass in an array of no watch variables to tie a number of
+them to the Chronicle object (note - this does NOT work with watch
+variables, you may only have one watch variable).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="s1">'abc'</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">dontWatchThis</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">norThis</span> <span class="o">=</span> <span class="s2">"I'm being"</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">ignorePlease</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span> <span class="o">=</span> <span class="nx">Chronicle</span><span class="p">.</span><span class="nx">record</span><span class="p">(</span><span class="s1">'watchThis'</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="p">[</span><span class="s1">'dontWatchThis'</span><span class="p">,</span> <span class="s1">'norThis'</span><span class="p">,</span> <span class="s1">'ignorePlease'</span><span class="p">]);</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">dontWatchThis</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="s1">'cba'</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">ignorePlease</span><span class="p">.</span><span class="nx">member</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">norThis</span> <span class="o">+=</span> <span class="s2">" ignored"</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">watchThis</span> <span class="o">=</span> <span class="s1">'abcdefg'</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">ignorePlease</span><span class="p">.</span><span class="nx">member</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+<span class="c1">//So currently</span>
+<span class="c1">//watchThis='abcdefg', dontWatchThis = 5,</span>
+<span class="c1">//norThis = "I'm being ignored", ignorePlease = {member: 1000}</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span>
+<span class="c1">//So now</span>
+<span class="c1">//watchThis='cba', dontWatchThis = 5,</span>
+<span class="c1">//norThis = "I'm being", ignorePlease = {}</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span>
+<span class="c1">//So now</span>
+<span class="c1">//watchThis='abc', dontWatchThis = 12,</span>
+<span class="c1">//norThis = "I'm being", ignorePlease = {}</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
+<span class="c1">//So now</span>
+<span class="c1">//watchThis='abcdefg', dontWatchThis = 5,</span>
+<span class="c1">//norThis = "I'm being ignored", ignorePlease = {member: 3}</span>
+</pre></div>
+
+<h2>
+<a name="on-event-handlers" class="anchor" href="#on-event-handlers"><span class="octicon octicon-link"></span></a><strong>On Event Handlers</strong>
+</h2>
+
+<p>You may want to perform a certain function when something happens in
+your Chronicle object. In order to do that, you may do as follows:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnUndoFunction</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+</pre></div>
+
+<p>This will make Chronicle call <code>$scope.fn()</code> whenever the <code>$scope.chron</code> object
+sucessfully undoes.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnRedoFunction</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+</pre></div>
+
+<p>This will make Chronicle call <code>$scope.fn()</code> whenever the <code>$scope.chron</code> object
+sucessfully redoes.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnAdjustFunction</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+</pre></div>
+
+<p>This will make Chronicle call <code>$scope.fn()</code> whenever the <code>$scope.chron</code> object
+sucessfully registers a change that is <em>not</em> an undo or redo - bascially any update
+to the model that isn't caused by a direct call to <code>undo()</code> or <code>redo()</code>.</p>
+
+<p>If you wish to call a function with arguements, I suggest the following
+structure, as at the moment Chronicle does not support that directly:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">passedVars</span><span class="p">){...}</span> <span class="c1">//The function that you wish to call</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">intermediatefn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">passingVars</span> <span class="o">=</span> <span class="p">...</span><span class="c1">//Get vars</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">fn</span><span class="p">(</span><span class="nx">passingVars</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">chron</span><span class="p">.</span><span class="nx">addOnAdjustFunction</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">intermediatefn</span><span class="p">);</span>
+</pre></div>
+
+<p>And if at any point you wish to remove any of these onEvent functions,
+just use <code>$scope.watchObj.removeOnEventFunction($scope.fn)</code>, where <code>Event</code> can be <code>Undo</code>,
+<code>Redo</code>, or <code>Adjust</code>.</p>
 
 <p>By <a href="https://github.com/Blitzen" class="user-mention">@Blitzen</a>, <a href="https://github.com/SamMaier" class="user-mention">@SamMaier</a></p>
         </section>
