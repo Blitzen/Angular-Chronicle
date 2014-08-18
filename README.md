@@ -24,8 +24,6 @@ is Chronicle's official page, and it contains a number of useful
 examples that cover different supported pieces of functionality.
 
 ## **Basic Usage**
-ADD LINK HERE FOR
-http://blitzen.github.io/Angular-Chronicle/#basic-example
 First things first, you have to start recording your variable:
 
 ```javascript
@@ -42,8 +40,9 @@ $scope.chronicle.canUndo();
 $scope.chronicle.canRedo();
 ```
 
-These functions should be self explanitory. This should be enough for
-basic undo/redo functionality.
+These functions should be self explanitory.
+[This](http://blitzen.github.io/Angular-Chronicle/#basic-example) should
+be enough for basic undo/redo functionality.
 
 ## **Full Usage**
 At the moment, there are only four arguments you can give
@@ -255,27 +254,25 @@ $scope.chron.redo();
 You may want to perform a certain function when something happens in
 your Chronicle object. In order to do that, you may do as follows:
 
-WHERE MUST FN BE??
-
 ```javascript
-$scope.chron.addOnUndoFunction(fn)
+$scope.chron.addOnUndoFunction($scope.fn)
 ```
 
-This will make Chronicle call `fn()` whenever the `$scope.chron` object
+This will make Chronicle call `$scope.fn()` whenever the `$scope.chron` object
 sucessfully undoes.
 
 ```javascript
-$scope.chron.addOnRedoFunction(fn)
+$scope.chron.addOnRedoFunction($scope.fn)
 ```
 
-This will make Chronicle call `fn()` whenever the `$scope.chron` object
+This will make Chronicle call `$scope.fn()` whenever the `$scope.chron` object
 sucessfully redoes.
 
 ```javascript
-$scope.chron.addOnAdjustFunction(fn)
+$scope.chron.addOnAdjustFunction($scope.fn)
 ```
 
-This will make Chronicle call `fn()` whenever the `$scope.chron` object
+This will make Chronicle call `$scope.fn()` whenever the `$scope.chron` object
 sucessfully registers a change that is *not* an undo or redo - bascially any update
 to the model that isn't caused by a direct call to `undo()` or `redo()`.
 
@@ -289,9 +286,9 @@ $scope.intermediatefn = function() {
   $scope.fn(passingVars);
 }
 ...
-$scope.chron.addOnAdjustFunction(intermediatefn);
+$scope.chron.addOnAdjustFunction($scope.intermediatefn);
 ```
 
 And if at any point you wish to remove any of these onEvent functions,
-just use `watchObj.removeOnEventFunction(fn)`, where `Event` can be `Undo`,
+just use `$scope.watchObj.removeOnEventFunction($scope.fn)`, where `Event` can be `Undo`,
 `Redo`, or `Adjust`.
