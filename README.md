@@ -41,7 +41,7 @@ $scope.chronicle.canRedo();
 ```
 
 These functions should be self explanitory.
-[This](http://blitzen.github.io/Angular-Chronicle/#basic-example) should
+[This](http://blitzen.github.io/Angular-Chronicle/#basic-usage) should
 be enough for basic undo/redo functionality.
 
 ## **Full Usage**
@@ -95,7 +95,8 @@ $scope.chron.removeOnAdjustFunction(fn);
 ```
 
 Removes the passed function call on the event. More info on the above 6
-functions [here](#on-event-handlers).
+functions
+[here](http://blitzen.github.io/Angular-Chronicle/#on-event-handlers).
 
 ```javascript
 $scope.chron.canUndo();
