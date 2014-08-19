@@ -219,6 +219,9 @@
         }
         else if (isString(noWatchVars)){
           this.parsedNoWatchVars.push($parse(noWatchVars));
+          if (isUndefined(this.parsedNoWatchVars[0](scope))){
+            throw new Error(noWatchVars + ", the 'no watch' variable passed to Chronicle, is not defined in the given scope");
+          }
         }
         else if (!isUndefined(noWatchVars)){
           throw new Error ("Incorect type for 'no watch' variables");
