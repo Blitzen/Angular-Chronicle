@@ -1,9 +1,8 @@
 # **Chronicle**
 An undo/redo service for AngularJS.
 
-Note: Since the current version is not yet at 1.x.x, there is the
-chance of API changes that could fundamentally wreck certain
-functionality. Use this beta at your own risk.
+This is tested for Angular 1.2.14+. Versions below 1.2.14 have been
+found to not work with Chronicle and are not officially supported.
 
 ## **Installation**
 The easiest way to install is just to use [Bower](http://bower.io/
@@ -106,3 +105,6 @@ $scope.chron.canRedo();
 Returns true if the action can be performed, false if you can't perform
 the action at the current time.
 
+## **Testing**
+In order to get the tests to work, run `sudo npm install` in the top level
+directory. Then use `grunt` to run the tests.
