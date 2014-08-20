@@ -1,5 +1,6 @@
 # **Chronicle**
-An undo/redo service for AngularJS.
+An undo/redo service for AngularJS. Supports user-friendly string
+handling, "controller as" syntax, and on event function calls.
 
 This is tested for Angular 1.2.14+. Versions below 1.2.14 have been
 found to not work with Chronicle and are not officially supported.
