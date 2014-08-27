@@ -18,6 +18,16 @@ However if you aren't using Bower, you can simply take the
 file and put it in your project and include
 it in your html file after you include your AngularJS source file.
 
+Then you must inject Chronicle into your module and controller.
+
+```javascript
+var myApp = angular.module('myApp',['Chronicle']);
+myApp.controller ('MyCtrl', function($scope, Chronicle){
+...
+})
+...
+```
+
 ## **Examples**
 [Here](http://blitzen.github.io/Angular-Chronicle "Chronicle Website")
 is Chronicle's official page, and it contains a number of useful
