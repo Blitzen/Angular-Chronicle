@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   //Set this to change what the maxiumum number of characters an undo will be to a string if using the string specific saving
-  var MAX_STRING_CHANGE_SIZE = 5;
+  var MAX_STRING_CHANGE_SIZE = 15;
   var isDefined = angular.isDefined,
     isUndefined = angular.isUndefined,
     isFunction = angular.isFunction,
