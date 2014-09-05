@@ -153,13 +153,13 @@
 
   angular.module('Chronicle', []).service('Chronicle',
     function ($rootScope, $parse) {
-      var watches = [];
+      this.watches = [];
 
       //This is called to create the Watch
       //watches is a private array which shouldn't have to be dealt with. May one day be useful for loading up specific watches
       this.record = function record( watchVar, scope, stringHandling, noWatchVars ){
         var newWatch = new Watch(watchVar, scope, stringHandling, noWatchVars);
-        watches.push(newWatch);
+        this.watches.push(newWatch);
         return newWatch;
       };
 

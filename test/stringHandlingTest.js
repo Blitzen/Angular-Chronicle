@@ -39,32 +39,32 @@ describe( 'Chronicle string handling', function() {
     expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcd ");
   }));
 
-  it( 'should add a new entry in the archive if there is a 6 character difference', inject( function() {
-    scope.obj.str = "abcdefghij";
+  it( 'should add a new entry in the archive if there is a 16 character difference', inject( function() {
+    scope.obj.str = "abcdefghij1234567890";
     scope.$apply();
 
-    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij");
+    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij1234567890");
   }));
 
-  it( 'should not add a new entry in the archive if there is a 4 character difference and its not the first one', inject( function() {
+  it( 'should not add a new entry in the archive if there is a 14 character difference and its not the first one', inject( function() {
     scope.obj.str = "abcdef";
     scope.$apply();
-    scope.obj.str = "abcdefghij";
+    scope.obj.str = "abcdefghij1234567890";
     scope.$apply();
 
-    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij");
+    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij1234567890");
   }));
 
-  it( 'should only add one new entry in the archive if there is two 4 character differences and its not the first difference', inject( function() {
+  it( 'should only add one new entry in the archive if there is two 14 character differences and its not the first difference', inject( function() {
     scope.obj.str = "abcdef";
     scope.$apply();
-    scope.obj.str = "abcdefghij";
+    scope.obj.str = "abcdefghij1234567890";
     scope.$apply();
-    scope.obj.str = "abcdefghijklmn";
+    scope.obj.str = "abcdefghij1234567890klmn1234567890";
     scope.$apply();
 
-    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij");
-    expect(scope.chronicle.archive[2].watchVar.str).toEqual("abcdefghijklmn");
+    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij1234567890");
+    expect(scope.chronicle.archive[2].watchVar.str).toEqual("abcdefghij1234567890klmn1234567890");
   }));
 
 });
