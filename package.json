@@ -1,6 +1,6 @@
 {
   "name": "Angular-Chronicle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An undo/redo service for AngularJS.",
   "main": "chronicle.js",
   "scripts": {
