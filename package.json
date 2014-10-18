@@ -21,7 +21,7 @@
     "karma-script-launcher": "^0.1.0"
   },
   "dependencies": {},
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Blitzen/Angular-Chronicle/issues"
   },
