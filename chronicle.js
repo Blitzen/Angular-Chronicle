@@ -90,39 +90,46 @@
   //   { areSimilar: true (since the second one contains the first one in order)
   //   differences: ['UUU', 'AAAA', '123']}
   function similarStringDifference(string1, string2){
-    var s1, s2;
-    //Ensuring s2 is longer or the same length as s1
-    if (string1.length > string2.length){
-      s2 = string1.split("");
-      s1 = string2.split("");
+    if (string1 && string2){
+      var s1, s2;
+      //Ensuring s2 is longer or the same length as s1
+      if (string1.length > string2.length){
+        s2 = string1.split("");
+        s1 = string2.split("");
+      }
+      else{
+        s1 = string1.split("");
+        s2 = string2.split("");
+      }
+      var j = 0;
+      var difference;
+      var differences = [];
+      for (var i = 0; (i < s1.length) && (j<s2.length); i++){
+        difference = '';
+        while(s1[i] != s2[j] && j<s2.length){
+          difference += s2[j];
+          j++;
+        }
+        //now s1[i] == s2[j] or j==s2.length
+        if (difference) differences.push(difference);
+        if (s1[i] == s2[j]) j++;
+      }
+
+      var areSimilar = (i == s1.length);
+      if (j<s2.length){
+        difference = '';
+        while (j<s2.length){
+          difference += s2[j];
+          j++;
+        }
+        differences.push(difference);
+      }
     }
     else{
-      s1 = string1.split("");
-      s2 = string2.split("");
-    }
-    var j = 0;
-    var difference;
-    var differences = [];
-    for (var i = 0; (i < s1.length) && (j<s2.length); i++){
-      difference = '';
-      while(s1[i] != s2[j] && j<s2.length){
-        difference += s2[j];
-        j++;
-      }
-      //now s1[i] == s2[j] or j==s2.length
-      if (difference) differences.push(difference);
-      if (s1[i] == s2[j]) j++;
+      var areSimilar = false;
+      var differences = [];
     }
 
-    var areSimilar = (i == s1.length);
-    if (j<s2.length){
-      difference = '';
-      while (j<s2.length){
-        difference += s2[j];
-        j++;
-      }
-      differences.push(difference);
-    }
     return {areSimilar: areSimilar, differences: differences};
   }
 
