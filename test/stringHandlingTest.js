@@ -67,4 +67,17 @@ describe( 'Chronicle string handling', function() {
     expect(scope.chronicle.archive[2].watchVar.str).toEqual("abcdefghij1234567890klmn1234567890");
   }));
 
+  it( 'should handle a new string attribute watch correctly', inject( function() {
+    scope.$apply();
+    scope.obj.newAttr = "";
+    scope.$apply();
+    scope.obj.newAttr = "s";
+    scope.$apply();
+    scope.obj.newAttr = "sam";
+    scope.$apply();
+
+    expect(scope.chronicle.archive[1].watchVar.newAttr).toEqual("");
+    expect(scope.chronicle.archive[2].watchVar.newAttr).toEqual("sam");
+  }));
+
 });
