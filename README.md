@@ -119,3 +119,6 @@ the action at the current time.
 ## **Testing**
 In order to get the tests to work, run `sudo npm install` in the top level
 directory. Then use `grunt` to run the tests.
+
+## **License**
+[MIT License](http://opensource.org/licenses/MIT)
