@@ -158,7 +158,7 @@
    return true;
   }
 
-  angular.module('Chronicle', []).service('Chronicle',
+  angular.module('Chronicle', []).service('Chronicle', ['$rootScope', '$parse',
     function ($rootScope, $parse) {
 
       //This is called to create the Watch
@@ -469,5 +469,5 @@
           } , true);
         }
       };
-    });
+    }]);
 })();
