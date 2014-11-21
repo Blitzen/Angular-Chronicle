@@ -15,7 +15,7 @@
 
   //These 3 functions are stolen from AngularJS to be able to use the modified angular.equals
   function isRegExp(value) {
-    return toString.call(value) === '[object RegExp]';
+    return value instanceof RegExp;
   }
   function isWindow(obj) {
     return obj && obj.window === obj;
