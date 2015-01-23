@@ -46,6 +46,16 @@ describe( 'Chronicle string handling', function() {
     expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdefghij1234567890");
   }));
 
+  it( 'should not remove a change if non string stuff is happening', inject( function() {
+    scope.obj.str = "abcdef";
+    scope.$apply();
+    scope.obj.str = "abcdefg";
+    scope.obj.zzz = 1;
+    scope.$apply();
+
+    expect(scope.chronicle.archive[1].watchVar.str).toEqual("abcdef");
+  }));
+
   it( 'should not add a new entry in the archive if there is a 14 character difference and its not the first one', inject( function() {
     scope.obj.str = "abcdef";
     scope.$apply();
