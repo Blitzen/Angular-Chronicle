@@ -44,14 +44,19 @@
         if (isArray(o1)) {
           if (!isArray(o2)) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           if ((length = o1.length) == o2.length) {
+            var returnEq = {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
             for(key=0; key<length; key++) {
               var eq = equals(o1[key], o2[key]);
               if (!eq.isEqual){
                 eq.unequalVariable = '['+String(key)+']' + eq.unequalVariable;
-                return eq;
+                if (!eq.stringDiff){
+                  return eq;
+                } else {
+                  returnEq = eq;
+                }
               }
             }
-            return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
+            return returnEq;
           }
         } else if (isDate(o1)) {
           return {isEqual: isDate(o2) && o1.getTime() == o2.getTime(), unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
@@ -60,12 +65,17 @@
         } else {
           if (isScope(o1) || isScope(o2) || isWindow(o1) || isWindow(o2) || isArray(o2)) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           keySet = {};
+          var returnEq = {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2}
           for(key in o1) {
             if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
             var eq = equals(o1[key], o2[key]);
             if (!eq.isEqual){
               eq.unequalVariable = '.'+String(key) + eq.unequalVariable;
-              return eq;
+              if (!eq.stringDiff){
+                return eq;
+              } else {
+                returnEq = eq;
+              }
             }
             keySet[key] = true;
           }
@@ -75,7 +85,7 @@
                 o2[key] !== undefined &&
                 !isFunction(o2[key])) return {isEqual: false, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
           }
-          return {isEqual: true, unequalVariable: '', stringDiff: false, o1: o1, o2: o2};
+          return returnEq;
         }
       }
     }
@@ -387,7 +397,10 @@
                   //We only consider them too similar if the same variable was changed last time and this time and their differences are considered to not be big enough by tooSimilar()
                   //Too similar means the
                   var tooSim = tooSimilar(differenceObject.differences);
-                  if (tooSim){
+                  if (typeof($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1])) != 'string'){
+                    tooSim = false;
+                  }
+                  else if (tooSim){
                     //Checks to see if the length of the string that was changed is more than MAX_STRING_CHANGE_SIZE characters in length different in the most recent entry than in the previous entry.
                     //($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
                     //$parse('watchVar'+eq.unequalVariable) is the parsedUnequalVariable but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
