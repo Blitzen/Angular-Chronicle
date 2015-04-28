@@ -157,7 +157,7 @@
 
     if (differences.length == 1){
       for (var a in differences[0]){
-        if (differences[0][a].match(whiteSpace)){
+        if (differences[0].hasOwnProperty(a) && differences[0][a].match(whiteSpace)){
           return false;
         }
       }
