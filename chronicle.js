@@ -70,7 +70,7 @@
             if (key.charAt(0) === '$' || isFunction(o1[key])) continue;
             var eq = equals(o1[key], o2[key]);
             if (!eq.isEqual){
-              eq.unequalVariable = '.'+String(key) + eq.unequalVariable;
+              eq.unequalVariable = String(key) + eq.unequalVariable;
               if (!eq.stringDiff){
                 return eq;
               } else {
@@ -385,7 +385,7 @@
             shouldBeAdded = true;
 
             //Getting the parsed variable that caused the inequality
-            var parsedUnequalVariable = $parse(this.watchVar + eq.unequalVariable);
+            var parsedUnequalVariable = $parse(this.watchVar + '["' + eq.unequalVariable + '"]');
 
             //now we are going to look at string differences... This block only matters if the watch has been initialized with their stringHandling set to true
             if (this.stringHandling && eq.stringDiff){
@@ -397,15 +397,15 @@
                   //We only consider them too similar if the same variable was changed last time and this time and their differences are considered to not be big enough by tooSimilar()
                   //Too similar means the
                   var tooSim = tooSimilar(differenceObject.differences);
-                  if (typeof($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1])) != 'string'){
+                  if (typeof($parse('watchVar'+'["' + eq.unequalVariable + '"]')(this.archive[this.currArchivePos-1])) != 'string'){
                     tooSim = false;
                   }
                   else if (tooSim){
                     //Checks to see if the length of the string that was changed is more than MAX_STRING_CHANGE_SIZE characters in length different in the most recent entry than in the previous entry.
-                    //($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
-                    //$parse('watchVar'+eq.unequalVariable) is the parsedUnequalVariable but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
+                    //($parse('watchVar'+'["' + eq.unequalVariable + '"]')(this.archive[this.currArchivePos-1]) is the most confusing part, it boils down as such:
+                    //$parse('watchVar'+'["' + eq.unequalVariable + '"]') is the parsedUnequalVariable but swapping out 'watchVar' for this.watchVar (a string containing the name of the watch var in the scope)
                     //(this.archive[this.currArchivePos-1]) is the archive entry before the one we are on. We look at the one before because the one we are currently on is likely going to be overwritten.
-                    if (Math.abs($parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos-1]).length - $parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos]).length) >= MAX_STRING_CHANGE_SIZE){
+                    if (Math.abs($parse('watchVar'+'["' + eq.unequalVariable + '"]')(this.archive[this.currArchivePos-1]).length - $parse('watchVar'+eq.unequalVariable)(this.archive[this.currArchivePos]).length) >= MAX_STRING_CHANGE_SIZE){
                       tooSim = false;
                     }
                   }
